@@ -70,11 +70,11 @@ export const Header: React.FC<HeaderProps> = ({
 
   return (
     <header className={`sticky top-0 z-40 bg-white transition-all duration-200 border-b border-gray-200/80 ${
-      isScrolled ? 'shadow-md py-2' : 'py-3.5'
+      isScrolled ? 'shadow-md py-1.5 sm:py-2' : 'py-2 sm:py-3.5'
     }`}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 flex items-center justify-between gap-2">
         {/* Brand Logo */}
-        <a href="#inicio" onClick={(e) => handleNavClick(e, '#inicio')} className="focus:outline-hidden">
+        <a href="#inicio" onClick={(e) => handleNavClick(e, '#inicio')} className="focus:outline-hidden shrink-0">
           <Logo logoUrl={logoUrl} subtext={logoSubtext} />
         </a>
 

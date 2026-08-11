@@ -10,7 +10,7 @@ export const TopBar: React.FC<TopBarProps> = ({ phones, whatsappNumber }) => {
   const cleanPhone = (phone: string) => phone.replace(/\D/g, '');
 
   return (
-    <div className="bg-slate-900 text-white text-xs py-2 px-4 border-b border-slate-800 transition-colors">
+    <div className="hidden md:block bg-slate-900 text-white text-xs py-2 px-4 border-b border-slate-800 transition-colors">
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-2">
         {/* Left: Schedule & Coverage */}
         <div className="flex items-center gap-4 text-slate-300 text-[11px] sm:text-xs">
