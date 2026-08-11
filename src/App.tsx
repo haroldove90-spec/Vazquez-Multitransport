@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { SiteConfig } from './types';
-import { loadSiteConfig, applyThemeColors } from './lib/supabaseClient';
+import { loadSiteConfig, loadSiteConfigFromSupabase, applyThemeColors } from './lib/supabaseClient';
 import { TopBar } from './components/TopBar';
 import { Header } from './components/Header';
 import { HeroSlider } from './components/HeroSlider';
@@ -15,7 +15,31 @@ import { MessageCircle } from 'lucide-react';
 
 export default function App() {
   const [config, setConfig] = useState<SiteConfig>(loadSiteConfig());
-  const [isAdminOpen, setIsAdminOpen] = useState(false);
+  const [currentView, setCurrentView] = useState<'landing' | 'admin'>('landing');
+
+  // Check URL hash for direct #admin access
+  useEffect(() => {
+    const handleHashChange = () => {
+      if (window.location.hash === '#admin' || window.location.pathname === '/admin') {
+        setCurrentView('admin');
+      }
+    };
+    handleHashChange();
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
+
+  // Fetch live config from Supabase on mount
+  useEffect(() => {
+    async function fetchRemoteConfig() {
+      const remoteConfig = await loadSiteConfigFromSupabase(config);
+      if (remoteConfig) {
+        setConfig(remoteConfig);
+        applyThemeColors(remoteConfig.primaryColor, remoteConfig.secondaryColor);
+      }
+    }
+    fetchRemoteConfig();
+  }, []);
 
   // Apply colors dynamically on boot or update
   useEffect(() => {
@@ -34,6 +58,33 @@ export default function App() {
     applyThemeColors(newConfig.primaryColor, newConfig.secondaryColor);
   };
 
+  const handleOpenAdmin = () => {
+    setCurrentView('admin');
+    window.location.hash = 'admin';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleCloseAdmin = () => {
+    setCurrentView('landing');
+    if (window.location.hash === '#admin') {
+      window.history.pushState("", document.title, window.location.pathname + window.location.search);
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  if (currentView === 'admin') {
+    return (
+      <div className="min-h-screen bg-gray-100 font-sans text-gray-900 selection:bg-[#0E5197] selection:text-white">
+        <AdminPanel
+          isOpen={true}
+          onClose={handleCloseAdmin}
+          config={config}
+          onUpdateConfig={handleUpdateConfig}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-white text-gray-900 font-sans selection:bg-[#0E5197] selection:text-white flex flex-col">
       {/* 1. Top Bar */}
@@ -47,7 +98,7 @@ export default function App() {
         logoUrl={config.logoUrl}
         logoSubtext={config.logoSubtext}
         whatsappNumber={config.whatsappNumber}
-        onOpenAdmin={() => setIsAdminOpen(true)}
+        onOpenAdmin={handleOpenAdmin}
       />
 
       {/* Main Anchor Content Sections */}
@@ -108,7 +159,7 @@ export default function App() {
         logoSubtext={config.logoSubtext}
         whatsappNumber={config.whatsappNumber}
         phones={config.topPhones}
-        onOpenAdmin={() => setIsAdminOpen(true)}
+        onOpenAdmin={handleOpenAdmin}
       />
 
       {/* Floating WhatsApp Action Button */}
@@ -126,14 +177,6 @@ export default function App() {
           </span>
         </a>
       )}
-
-      {/* Admin Panel Drawer */}
-      <AdminPanel
-        isOpen={isAdminOpen}
-        onClose={() => setIsAdminOpen(false)}
-        config={config}
-        onUpdateConfig={handleUpdateConfig}
-      />
     </div>
   );
 }

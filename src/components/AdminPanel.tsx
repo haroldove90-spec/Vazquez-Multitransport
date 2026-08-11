@@ -132,37 +132,71 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex justify-end">
-      <div className="w-full max-w-4xl bg-white h-full shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-right duration-300">
-        {/* Panel Header */}
-        <div className="bg-slate-900 text-white px-6 py-4 flex items-center justify-between border-b border-slate-800">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-md bg-blue-600 text-white">
-              <Sliders className="w-5 h-5" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-bold text-white uppercase tracking-wider">ADMIN MODE: VAZQUE MULTITRANSPORT</span>
-                <span className="opacity-50 text-xs">|</span>
-                <span className="flex items-center gap-1.5 text-[11px] text-emerald-400 font-medium">
-                  <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-                  {formData.supabaseUrl && formData.supabaseAnonKey ? 'Conectado a Supabase' : 'Modo Local Activo'}
-                </span>
-              </div>
-              <p className="text-[11px] text-gray-400 mt-0.5">Ajustes Generales, Slider Principal, Contenido y Redes</p>
-            </div>
+    <div className="min-h-screen bg-gray-100 flex flex-col w-full">
+      {/* Top Admin Header Bar matching theme screenshot */}
+      <div className="bg-slate-900 text-white px-6 py-3.5 flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 shadow-md">
+        <div className="flex items-center gap-3">
+          <div className="p-2 rounded-md bg-blue-600 text-white">
+            <Sliders className="w-5 h-5" />
           </div>
-
-          <button
-            onClick={onClose}
-            className="p-1.5 text-gray-400 hover:text-white hover:bg-slate-800 rounded transition-colors"
-          >
-            <X className="w-5 h-5" />
-          </button>
+          <div>
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-xs sm:text-sm font-bold text-white uppercase tracking-wider">
+                ADMIN MODE: VAZQUE MULTITRANSPORT
+              </span>
+              <span className="opacity-50 text-xs hidden sm:inline">|</span>
+              <span className="flex items-center gap-1.5 text-xs text-emerald-400 font-medium">
+                <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                Conectado a Supabase (snjcjrjyoouzhixymbnq)
+              </span>
+            </div>
+            <p className="text-xs text-slate-400 mt-0.5">
+              Panel Autoadministrable • Hostinger & Supabase Cloud Ready
+            </p>
+          </div>
         </div>
 
-        {/* Tab Navigation */}
-        <div className="flex overflow-x-auto bg-gray-100 border-b border-gray-200 scrollbar-none px-4 pt-2">
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={handleSave}
+            className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2 rounded transition-colors shadow-sm cursor-pointer"
+          >
+            <Save className="w-4 h-4" />
+            <span>Guardar Cambios</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={onClose}
+            className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white text-xs font-semibold px-4 py-2 rounded transition-colors border border-white/20 cursor-pointer"
+          >
+            <span>Ver Sitio en Vivo</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Main Admin Page Workspace */}
+      <div className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 md:p-8 flex flex-col">
+        {/* Status Toast Notification */}
+        {saveStatus.message && (
+          <div className={`mb-4 p-4 rounded-xl border flex items-center justify-between gap-3 text-sm font-semibold shadow-sm ${
+            saveStatus.type === 'success'
+              ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+              : saveStatus.type === 'error'
+              ? 'bg-red-50 text-red-800 border-red-200'
+              : 'bg-blue-50 text-blue-800 border-blue-200'
+          }`}>
+            <div className="flex items-center gap-2.5">
+              <RefreshCw className={`w-5 h-5 shrink-0 ${!saveStatus.type ? 'animate-spin text-blue-600' : 'text-emerald-600'}`} />
+              <span>{saveStatus.message}</span>
+            </div>
+          </div>
+        )}
+
+        <div className="bg-white rounded-xl shadow-lg border border-gray-200 flex-1 flex flex-col overflow-hidden">
+          {/* Tab Navigation */}
+          <div className="flex overflow-x-auto bg-gray-50 border-b border-gray-200 scrollbar-none px-4 pt-2">
           <button
             onClick={() => setActiveTab('general')}
             className={`flex items-center gap-2 px-4 py-3 font-bold text-xs uppercase tracking-wider border-b-2 whitespace-nowrap transition-colors ${
@@ -832,21 +866,48 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
               <div className="bg-emerald-50/80 p-5 rounded-2xl border border-emerald-200 space-y-3">
                 <div className="flex items-center gap-2 text-emerald-900 font-extrabold text-base">
                   <Database className="w-5 h-5 text-[#1D7946]" />
-                  <span>Integración con Base de Datos Supabase</span>
+                  <span>Configuración del Proyecto Supabase (vazquezadmin)</span>
                 </div>
                 <p className="text-xs text-emerald-800 leading-relaxed font-medium">
-                  Configure su proyecto de Supabase para guardar la configuración, imágenes del slider y catálogo en la nube. Si deja estos campos en blanco, todo se guardará de forma ultra-rápida en el almacenamiento local del navegador (LocalStorage).
+                  Su proyecto de Supabase está preconfigurado para sincronización en la nube en tiempo real. Cuando realice cambios desde este panel autoadministrable, se actualizarán en Supabase y se cargarán automáticamente en su página web alojada en Hostinger.
                 </p>
               </div>
 
               <div className="bg-gray-50 p-5 rounded-2xl border border-gray-200 space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 uppercase mb-1">
+                      ID del Proyecto (Project ID)
+                    </label>
+                    <input
+                      type="text"
+                      readOnly
+                      value="snjcjrjyoouzhixymbnq"
+                      className="w-full px-4 py-2 rounded-lg border border-gray-300 text-xs font-mono bg-gray-100 text-gray-700"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 uppercase mb-1">
+                      Bucket de Storage (Imágenes)
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="vazquez-media"
+                      value={formData.supabaseBucketName}
+                      onChange={(e) => setFormData({ ...formData, supabaseBucketName: e.target.value })}
+                      className="w-full px-4 py-2 rounded-lg border border-gray-300 text-xs font-mono"
+                    />
+                  </div>
+                </div>
+
                 <div>
                   <label className="block text-xs font-bold text-gray-700 uppercase mb-1">
                     Supabase Project URL
                   </label>
                   <input
                     type="text"
-                    placeholder="https://xyz.supabase.co"
+                    placeholder="https://snjcjrjyoouzhixymbnq.supabase.co"
                     value={formData.supabaseUrl}
                     onChange={(e) => setFormData({ ...formData, supabaseUrl: e.target.value })}
                     className="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-sm font-mono"
@@ -855,27 +916,14 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
 
                 <div>
                   <label className="block text-xs font-bold text-gray-700 uppercase mb-1">
-                    Supabase Anon Key
-                  </label>
-                  <input
-                    type="password"
-                    placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-                    value={formData.supabaseAnonKey}
-                    onChange={(e) => setFormData({ ...formData, supabaseAnonKey: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-sm font-mono"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 uppercase mb-1">
-                    Nombre del Bucket de Storage (Imágenes)
+                    Supabase Anon Key (API Key)
                   </label>
                   <input
                     type="text"
-                    placeholder="vazquez-media"
-                    value={formData.supabaseBucketName}
-                    onChange={(e) => setFormData({ ...formData, supabaseBucketName: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-sm font-mono"
+                    placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                    value={formData.supabaseAnonKey}
+                    onChange={(e) => setFormData({ ...formData, supabaseAnonKey: e.target.value })}
+                    className="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-xs font-mono"
                   />
                 </div>
 
@@ -885,11 +933,51 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                     id="useSupabaseStorage"
                     checked={formData.useSupabaseStorage}
                     onChange={(e) => setFormData({ ...formData, useSupabaseStorage: e.target.checked })}
-                    className="w-4 h-4 text-[#0E5197] rounded"
+                    className="w-4 h-4 text-[#0E5197] rounded cursor-pointer"
                   />
-                  <label htmlFor="useSupabaseStorage" className="text-xs font-bold text-gray-800">
-                    Activar subida directa de archivos a Supabase Storage
+                  <label htmlFor="useSupabaseStorage" className="text-xs font-bold text-gray-800 cursor-pointer">
+                    Activar subida directa de imágenes y logos a Supabase Storage
                   </label>
+                </div>
+              </div>
+
+              {/* Guía para Hostinger y Código SQL de Inicialización */}
+              <div className="bg-blue-50/70 p-5 rounded-2xl border border-blue-200 space-y-4">
+                <div className="flex items-center gap-2 text-[#0E5197] font-extrabold text-sm uppercase tracking-wide">
+                  <Sparkles className="w-4 h-4 text-[#0E5197]" />
+                  <span>Script SQL de Inicialización en Supabase (Copiar en SQL Editor)</span>
+                </div>
+                <p className="text-xs text-blue-900 leading-relaxed font-normal">
+                  Si aún no ha creado la tabla de configuración en su panel de Supabase, vaya al <strong>SQL Editor</strong> de su proyecto en Supabase (ID: <code>snjcjrjyoouzhixymbnq</code>) y ejecute este comando:
+                </p>
+                <div className="relative">
+                  <pre className="bg-slate-900 text-emerald-300 p-4 rounded-xl text-[11px] font-mono overflow-x-auto leading-relaxed">
+{`-- 1. Crear tabla para guardar la configuración completa del sitio
+create table if not exists public.site_config (
+  id text primary key,
+  content jsonb not null,
+  updated_at timestamp with time zone default timezone('utc'::text, now())
+);
+
+-- 2. Habilitar permisos de lectura y actualización pública
+alter table public.site_config enable row level security;
+create policy "Acceso Publico site_config" on public.site_config for all using (true) with check (true);
+
+-- 3. Crear Bucket 'vazquez-media' en Supabase Storage
+insert into storage.buckets (id, name, public) values ('vazquez-media', 'vazquez-media', true) on conflict do nothing;
+create policy "Acceso Publico Storage Media" on storage.objects for all using (bucket_id = 'vazquez-media') with check (bucket_id = 'vazquez-media');`}
+                  </pre>
+                </div>
+
+                <div className="pt-2 border-t border-blue-200/80">
+                  <h4 className="text-xs font-bold text-[#0E5197] uppercase mb-1">
+                    🚀 Pasos para publicar su sitio web en Hostinger:
+                  </h4>
+                  <ol className="list-decimal list-inside text-xs text-gray-700 space-y-1 pl-1">
+                    <li>Generar la compilación ejecutando el comando de exportación o build de la aplicación.</li>
+                    <li>Subir el contenido generado en la carpeta <code>dist/</code> al directorio <code>public_html</code> del File Manager en Hostinger.</li>
+                    <li>¡Listo! El sitio cargará los datos guardados en Supabase automáticamente. Para editar el contenido en Hostinger, puede ingresar agregando <code>/#admin</code> a su dominio.</li>
+                  </ol>
                 </div>
               </div>
             </div>
@@ -897,25 +985,26 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
         </div>
 
         {/* Panel Footer Action */}
-        <div className="p-6 bg-gray-100 border-t border-gray-200 flex items-center justify-between gap-4">
+        <div className="p-6 bg-gray-50 border-t border-gray-200 flex items-center justify-between gap-4 rounded-b-xl">
           <button
             type="button"
             onClick={onClose}
-            className="px-5 py-3 rounded-xl border border-gray-300 text-gray-700 font-bold text-sm hover:bg-gray-200 transition-colors"
+            className="px-5 py-2.5 rounded-lg border border-gray-300 text-gray-700 font-bold text-xs hover:bg-gray-200 transition-colors cursor-pointer"
           >
-            Cancelar
+            Volver a la Página Principal
           </button>
 
           <button
             type="button"
             onClick={handleSave}
-            className="inline-flex items-center gap-2 bg-[#1D7946] hover:bg-emerald-700 text-white font-extrabold text-sm px-6 py-3 rounded-xl transition-all shadow-lg transform hover:-translate-y-0.5 cursor-pointer"
+            className="inline-flex items-center gap-2 bg-[#1D7946] hover:bg-emerald-700 text-white font-bold text-xs px-6 py-2.5 rounded-lg transition-all shadow-md transform hover:-translate-y-0.5 cursor-pointer"
           >
-            <Save className="w-5 h-5" />
+            <Save className="w-4 h-4" />
             <span>Guardar Todos los Cambios</span>
           </button>
         </div>
       </div>
     </div>
+  </div>
   );
 };

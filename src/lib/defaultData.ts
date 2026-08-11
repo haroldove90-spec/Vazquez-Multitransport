@@ -166,8 +166,8 @@ export const DEFAULT_SITE_CONFIG: SiteConfig = {
   contactSubtitle: "Atención inmediata por WhatsApp y líneas telefónicas directas",
   contactMessage: "Estamos listos para atenderle. Contáctenos hoy mismo a través de WhatsApp o por llamada telefónica para recibir una cotización rápida y sin compromiso para su mudanza o flete.",
 
-  supabaseUrl: "",
-  supabaseAnonKey: "",
+  supabaseUrl: "https://snjcjrjyoouzhixymbnq.supabase.co",
+  supabaseAnonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNuamNqcmp5b291emhpeHltYm5xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY0NTA4ODUsImV4cCI6MjEwMjAyNjg4NX0.7oyCWh91A6fEDmKfgijnhABrkuiWulLJmKUXz5W1WQI",
   supabaseBucketName: "vazquez-media",
-  useSupabaseStorage: false
+  useSupabaseStorage: true
 };
