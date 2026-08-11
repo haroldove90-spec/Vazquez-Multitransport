@@ -24,12 +24,13 @@ export const Footer: React.FC<FooterProps> = ({
     const targetId = href.replace('#', '');
     const targetEl = document.getElementById(targetId);
     if (targetEl) {
-      const headerOffset = 80;
+      const headerEl = document.querySelector('header');
+      const headerOffset = headerEl ? headerEl.offsetHeight : 70;
       const elementPosition = targetEl.getBoundingClientRect().top;
       const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
 
       window.scrollTo({
-        top: offsetPosition,
+        top: Math.max(0, offsetPosition),
         behavior: 'smooth'
       });
     }

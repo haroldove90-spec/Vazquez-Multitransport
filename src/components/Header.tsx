@@ -53,18 +53,29 @@ export const Header: React.FC<HeaderProps> = ({
 
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault();
-    setIsMenuOpen(false);
     const targetId = href.replace('#', '');
-    const targetEl = document.getElementById(targetId);
-    if (targetEl) {
-      const headerOffset = 80;
-      const elementPosition = targetEl.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+    const wasMenuOpen = isMenuOpen;
+    setIsMenuOpen(false);
 
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: 'smooth'
-      });
+    const performScroll = () => {
+      const targetEl = document.getElementById(targetId);
+      if (targetEl) {
+        const headerEl = document.querySelector('header');
+        const headerOffset = headerEl ? headerEl.offsetHeight : 70;
+        const elementPosition = targetEl.getBoundingClientRect().top;
+        const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+        window.scrollTo({
+          top: Math.max(0, offsetPosition),
+          behavior: 'smooth'
+        });
+      }
+    };
+
+    if (wasMenuOpen) {
+      setTimeout(performScroll, 260);
+    } else {
+      performScroll();
     }
   };
 
