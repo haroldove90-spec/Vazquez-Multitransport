@@ -11,11 +11,15 @@ import { GallerySlider } from './components/GallerySlider';
 import { ContactSection } from './components/ContactSection';
 import { Footer } from './components/Footer';
 import { AdminPanel } from './components/AdminPanel';
+import { AdminLogin } from './components/AdminLogin';
 import { MessageCircle } from 'lucide-react';
 
 export default function App() {
   const [config, setConfig] = useState<SiteConfig>(loadSiteConfig());
   const [currentView, setCurrentView] = useState<'landing' | 'admin'>('landing');
+  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState<boolean>(() => {
+    return sessionStorage.getItem('vazquez_admin_authenticated') === 'true';
+  });
 
   // Check URL hash for direct #admin access
   useEffect(() => {
@@ -81,12 +85,28 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const handleAdminLogout = () => {
+    sessionStorage.removeItem('vazquez_admin_authenticated');
+    setIsAdminAuthenticated(false);
+  };
+
   if (currentView === 'admin') {
+    if (!isAdminAuthenticated) {
+      return (
+        <AdminLogin
+          config={config}
+          onLoginSuccess={() => setIsAdminAuthenticated(true)}
+          onBackToSite={handleCloseAdmin}
+        />
+      );
+    }
+
     return (
       <div className="min-h-screen bg-gray-100 font-sans text-gray-900 selection:bg-[#0E5197] selection:text-white">
         <AdminPanel
           isOpen={true}
           onClose={handleCloseAdmin}
+          onLogout={handleAdminLogout}
           config={config}
           onUpdateConfig={handleUpdateConfig}
         />

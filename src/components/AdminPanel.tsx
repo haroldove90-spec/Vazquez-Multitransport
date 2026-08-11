@@ -24,6 +24,7 @@ import {
 interface AdminPanelProps {
   isOpen: boolean;
   onClose: () => void;
+  onLogout?: () => void;
   config: SiteConfig;
   onUpdateConfig: (newConfig: SiteConfig) => void;
 }
@@ -35,15 +36,32 @@ create table if not exists public.site_config (
   updated_at timestamp with time zone default timezone('utc'::text, now())
 );
 
--- 2. Habilitar permisos de lectura y actualización pública
+-- 2. Crear tabla de usuarios administradores
+create table if not exists public.admin_users (
+  id uuid primary key default gen_random_uuid(),
+  username text unique not null,
+  password text not null,
+  created_at timestamp with time zone default timezone('utc'::text, now())
+);
+
+-- Insertar o actualizar credenciales requeridas
+insert into public.admin_users (username, password)
+values ('admin_1', 'Admin_123')
+on conflict (username) do update set password = 'Admin_123';
+
+-- 3. Habilitar permisos RLS
 alter table public.site_config enable row level security;
 drop policy if exists "Acceso Publico site_config" on public.site_config;
 create policy "Acceso Publico site_config" on public.site_config for all using (true) with check (true);
 
--- 3. Crear Bucket 'vazquez-media' para guardar imágenes
+alter table public.admin_users enable row level security;
+drop policy if exists "Acceso Lectura admin_users" on public.admin_users;
+create policy "Acceso Lectura admin_users" on public.admin_users for select using (true);
+
+-- 4. Crear Bucket 'vazquez-media' para guardar imágenes
 insert into storage.buckets (id, name, public) values ('vazquez-media', 'vazquez-media', true) on conflict (id) do update set public = true;
 
--- 4. Habilitar politicas de acceso publico para el bucket
+-- 5. Habilitar politicas de acceso publico para el bucket
 drop policy if exists "Permitir ver imagenes publicas" on storage.objects;
 create policy "Permitir ver imagenes publicas" on storage.objects for select using (bucket_id = 'vazquez-media');
 
@@ -56,6 +74,7 @@ create policy "Permitir actualizar imagenes publicas" on storage.objects for upd
 export const AdminPanel: React.FC<AdminPanelProps> = ({
   isOpen,
   onClose,
+  onLogout,
   config,
   onUpdateConfig,
 }) => {
@@ -284,6 +303,18 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
           >
             <span>Ver Sitio en Vivo</span>
           </button>
+
+          {onLogout && (
+            <button
+              type="button"
+              onClick={onLogout}
+              className="inline-flex items-center gap-1.5 bg-red-600/80 hover:bg-red-600 text-white text-xs font-semibold px-3 py-2 rounded transition-colors border border-red-500/30 cursor-pointer"
+              title="Cerrar Sesión de Administrador"
+            >
+              <Lock className="w-3.5 h-3.5" />
+              <span>Cerrar Sesión</span>
+            </button>
+          )}
         </div>
       </div>
 
