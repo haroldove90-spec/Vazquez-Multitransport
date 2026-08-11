@@ -35,6 +35,7 @@ export interface SiteConfig {
   secondaryColor: string;
   
   // Contact & Top Bar
+  faviconUrl?: string;
   topPhones: string[];
   whatsappNumber: string;
   whatsappMessage: string;

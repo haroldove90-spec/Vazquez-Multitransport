@@ -4,6 +4,7 @@ export const DEFAULT_SITE_CONFIG: SiteConfig = {
   pageTitle: "Vazquez Multitransport - Mudanzas y Transporte Local y Foráneo",
   logoUrl: "", // Blank uses SVG logo component by default or image if uploaded
   logoSubtext: "Soluciones Integrales de Logística",
+  faviconUrl: "",
   primaryColor: "#0E5197",
   secondaryColor: "#1D7946",
 

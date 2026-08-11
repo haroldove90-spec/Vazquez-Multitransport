@@ -46,12 +46,21 @@ export default function App() {
     applyThemeColors(config.primaryColor, config.secondaryColor);
   }, [config.primaryColor, config.secondaryColor]);
 
-  // Update page title
+  // Update page title and favicon
   useEffect(() => {
     if (config.pageTitle) {
       document.title = config.pageTitle;
     }
-  }, [config.pageTitle]);
+    if (config.faviconUrl) {
+      let link: HTMLLinkElement | null = document.querySelector("link[rel*='icon']");
+      if (!link) {
+        link = document.createElement('link');
+        link.rel = 'shortcut icon';
+        document.getElementsByTagName('head')[0].appendChild(link);
+      }
+      link.href = config.faviconUrl;
+    }
+  }, [config.pageTitle, config.faviconUrl]);
 
   const handleUpdateConfig = (newConfig: SiteConfig) => {
     setConfig(newConfig);

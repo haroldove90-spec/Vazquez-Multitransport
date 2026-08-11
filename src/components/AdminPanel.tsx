@@ -66,10 +66,27 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   const [copiedSql, setCopiedSql] = useState(false);
 
   const logoFileInputRef = useRef<HTMLInputElement>(null);
+  const faviconFileInputRef = useRef<HTMLInputElement>(null);
   const aboutImageFileInputRef = useRef<HTMLInputElement>(null);
   const sliderFileInputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const galleryFileInputRef = useRef<HTMLInputElement>(null);
   const [uploadProgress, setUploadProgress] = useState<{ current: number; total: number } | null>(null);
+
+  const handleFaviconUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    try {
+      const url = await uploadImageFile(file, formData);
+      setFormData(prev => ({ ...prev, faviconUrl: url }));
+    } catch (err) {
+      console.error('Error subiendo favicon:', err);
+    } finally {
+      setIsUploading(false);
+      if (e.target) e.target.value = '';
+    }
+  };
 
   const handleAboutImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -510,7 +527,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                     type="button"
                     onClick={() => logoFileInputRef.current?.click()}
                     disabled={isUploading}
-                    className="inline-flex items-center gap-2 bg-[#0E5197] text-white font-bold text-xs px-4 py-2.5 rounded-xl hover:bg-blue-900 transition-colors shadow-xs"
+                    className="inline-flex items-center gap-2 bg-[#0E5197] text-white font-bold text-xs px-4 py-2.5 rounded-xl hover:bg-blue-900 transition-colors shadow-xs cursor-pointer disabled:opacity-50"
                   >
                     <Upload className="w-4 h-4" />
                     <span>{isUploading ? 'Subiendo imagen...' : 'Subir Imagen de Logo'}</span>
@@ -520,7 +537,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                     <button
                       type="button"
                       onClick={() => setFormData({ ...formData, logoUrl: '' })}
-                      className="text-xs text-red-600 font-bold hover:underline"
+                      className="text-xs text-red-600 font-bold hover:underline cursor-pointer"
                     >
                       Restablecer Logo Predeterminado
                     </button>
@@ -532,6 +549,67 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                     <img src={formData.logoUrl} alt="Logo Preview" className="h-16 w-auto object-contain" />
                   </div>
                 )}
+              </div>
+
+              {/* Favicon Upload Section */}
+              <div className="bg-gray-50 p-5 rounded-2xl border border-gray-200 space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-extrabold text-base text-gray-900">Favicon del Sitio (Ícono de Pestaña del Navegador)</h3>
+                  <span className="text-xs font-semibold bg-emerald-100 text-[#1D7946] px-2.5 py-0.5 rounded-full">Personalizable</span>
+                </div>
+                <p className="text-xs text-gray-600">
+                  Suba la imagen que se mostrará en la pestaña del navegador (recomendado: imagen cuadrada .ico, .png, .svg de 32x32 o 64x64 píxeles).
+                </p>
+
+                <div className="flex flex-col sm:flex-row items-center gap-4">
+                  <input
+                    type="file"
+                    ref={faviconFileInputRef}
+                    onChange={handleFaviconUpload}
+                    accept="image/*,.ico"
+                    className="hidden"
+                  />
+
+                  <button
+                    type="button"
+                    onClick={() => faviconFileInputRef.current?.click()}
+                    disabled={isUploading}
+                    className="inline-flex items-center gap-2 bg-[#1D7946] hover:bg-emerald-800 text-white font-bold text-xs px-4 py-2.5 rounded-xl transition-colors shadow-xs cursor-pointer disabled:opacity-50"
+                  >
+                    <Upload className="w-4 h-4" />
+                    <span>{isUploading ? 'Subiendo favicon...' : 'Subir o Reemplazar Favicon'}</span>
+                  </button>
+
+                  {formData.faviconUrl && (
+                    <button
+                      type="button"
+                      onClick={() => setFormData({ ...formData, faviconUrl: '' })}
+                      className="text-xs text-red-600 font-bold hover:underline cursor-pointer"
+                    >
+                      Quitar Favicon
+                    </button>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-3 pt-2">
+                  <div className="w-full">
+                    <label className="block text-[10px] font-bold text-gray-600 uppercase mb-1">URL Directa del Favicon</label>
+                    <input
+                      type="text"
+                      placeholder="https://..."
+                      value={formData.faviconUrl || ''}
+                      onChange={(e) => setFormData({ ...formData, faviconUrl: e.target.value })}
+                      className="w-full px-3 py-1.5 rounded-lg border border-gray-300 text-xs font-mono"
+                    />
+                  </div>
+
+                  {formData.faviconUrl && (
+                    <div className="shrink-0 p-2 bg-white rounded-lg border border-gray-200 flex flex-col items-center">
+                      <span className="text-[9px] font-bold text-gray-400 mb-1">Vista previa</span>
+                      <img src={formData.faviconUrl} alt="Favicon Preview" className="w-8 h-8 object-contain" />
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Dynamic Theme Colors */}
