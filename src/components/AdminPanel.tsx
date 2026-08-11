@@ -66,9 +66,26 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   const [copiedSql, setCopiedSql] = useState(false);
 
   const logoFileInputRef = useRef<HTMLInputElement>(null);
+  const aboutImageFileInputRef = useRef<HTMLInputElement>(null);
   const sliderFileInputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const galleryFileInputRef = useRef<HTMLInputElement>(null);
   const [uploadProgress, setUploadProgress] = useState<{ current: number; total: number } | null>(null);
+
+  const handleAboutImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    try {
+      const url = await uploadImageFile(file, formData);
+      setFormData(prev => ({ ...prev, aboutImageUrl: url }));
+    } catch (err) {
+      console.error('Error subiendo imagen de Nuestra Empresa:', err);
+    } finally {
+      setIsUploading(false);
+      if (e.target) e.target.value = '';
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -853,8 +870,94 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
               </div>
 
               {/* About Section */}
-              <div className="bg-gray-50 p-5 rounded-2xl border border-gray-200 space-y-4">
-                <h3 className="font-extrabold text-base text-gray-900">Sección "Nosotros" (Descripción de la Empresa)</h3>
+              <div className="bg-gray-50 p-5 rounded-2xl border border-gray-200 space-y-5">
+                <h3 className="font-extrabold text-base text-gray-900 flex items-center justify-between">
+                  <span>Sección "Nosotros" (Descripción e Imagen de la Empresa)</span>
+                  <span className="text-xs font-semibold bg-blue-100 text-[#0E5197] px-2.5 py-0.5 rounded-full">Personalizable 100%</span>
+                </h3>
+
+                {/* About Image Upload Box */}
+                <div className="p-4 bg-white rounded-xl border border-gray-200 space-y-3">
+                  <label className="block text-xs font-bold text-gray-700 uppercase">
+                    Imagen Principal de la Sección "Nuestra Empresa"
+                  </label>
+                  
+                  <div className="flex flex-col sm:flex-row items-center gap-4">
+                    {formData.aboutImageUrl ? (
+                      <img
+                        src={formData.aboutImageUrl}
+                        alt="Vista Previa Nuestra Empresa"
+                        className="w-32 h-24 object-cover rounded-lg border border-gray-200 shadow-2xs shrink-0"
+                      />
+                    ) : (
+                      <div className="w-32 h-24 bg-gray-100 rounded-lg border border-dashed border-gray-300 flex items-center justify-center text-gray-400 shrink-0">
+                        <ImageIcon className="w-8 h-8" />
+                      </div>
+                    )}
+
+                    <div className="space-y-2 w-full">
+                      <input
+                        type="file"
+                        ref={aboutImageFileInputRef}
+                        accept="image/*"
+                        onChange={handleAboutImageUpload}
+                        className="hidden"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => aboutImageFileInputRef.current?.click()}
+                        disabled={isUploading}
+                        className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#0E5197] hover:bg-blue-800 text-white font-bold text-xs px-4 py-2 rounded-xl transition-all shadow-xs cursor-pointer disabled:opacity-50"
+                      >
+                        <Upload className="w-4 h-4" />
+                        <span>{isUploading ? 'Subiendo Imagen...' : 'Subir o Reemplazar Imagen'}</span>
+                      </button>
+
+                      <div className="pt-1">
+                        <input
+                          type="text"
+                          placeholder="O ingrese la URL directa de la imagen..."
+                          value={formData.aboutImageUrl || ''}
+                          onChange={(e) => setFormData({ ...formData, aboutImageUrl: e.target.value })}
+                          className="w-full px-3 py-1.5 rounded-lg border border-gray-300 text-xs font-mono"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-gray-100">
+                    <div>
+                      <label className="block text-[10px] font-bold text-gray-600 uppercase mb-1">Insignia / Badge de Imagen</label>
+                      <input
+                        type="text"
+                        value={formData.aboutImageBadge || ''}
+                        onChange={(e) => setFormData({ ...formData, aboutImageBadge: e.target.value })}
+                        placeholder="Ej. Garantía de Satisfacción"
+                        className="w-full px-3 py-1.5 rounded-lg border border-gray-300 text-xs font-bold"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-bold text-gray-600 uppercase mb-1">Título de la Imagen</label>
+                      <input
+                        type="text"
+                        value={formData.aboutImageTitle || ''}
+                        onChange={(e) => setFormData({ ...formData, aboutImageTitle: e.target.value })}
+                        placeholder="Ej. Personal Altamente Capacitado"
+                        className="w-full px-3 py-1.5 rounded-lg border border-gray-300 text-xs font-bold"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-bold text-gray-600 uppercase mb-1">Subtítulo de la Imagen</label>
+                      <input
+                        type="text"
+                        value={formData.aboutImageSubtitle || ''}
+                        onChange={(e) => setFormData({ ...formData, aboutImageSubtitle: e.target.value })}
+                        placeholder="Ej. Protección, embalaje..."
+                        className="w-full px-3 py-1.5 rounded-lg border border-gray-300 text-xs"
+                      />
+                    </div>
+                  </div>
+                </div>
 
                 <div>
                   <label className="block text-xs font-bold text-gray-700 uppercase mb-1">
@@ -870,7 +973,19 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
 
                 <div>
                   <label className="block text-xs font-bold text-gray-700 uppercase mb-1">
-                    Descripción del Negocio
+                    Subtítulo de la Sección
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.aboutSubtitle}
+                    onChange={(e) => setFormData({ ...formData, aboutSubtitle: e.target.value })}
+                    className="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-sm font-semibold text-[#1D7946]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 uppercase mb-1">
+                    Descripción Completa del Negocio
                   </label>
                   <textarea
                     rows={5}
@@ -878,6 +993,109 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                     onChange={(e) => setFormData({ ...formData, aboutDescription: e.target.value })}
                     className="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-sm font-normal"
                   />
+                </div>
+
+                {/* Feature 1 & 2 Cards */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                  <div className="p-3.5 bg-white rounded-xl border border-gray-200 space-y-2">
+                    <span className="text-[10px] font-extrabold uppercase text-[#1D7946]">Destacado 1</span>
+                    <div>
+                      <label className="block text-[10px] font-bold text-gray-600 mb-0.5">Título</label>
+                      <input
+                        type="text"
+                        value={formData.aboutFeature1Title || ''}
+                        onChange={(e) => setFormData({ ...formData, aboutFeature1Title: e.target.value })}
+                        className="w-full px-3 py-1.5 rounded-lg border border-gray-300 text-xs font-bold"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-bold text-gray-600 mb-0.5">Descripción</label>
+                      <input
+                        type="text"
+                        value={formData.aboutFeature1Desc || ''}
+                        onChange={(e) => setFormData({ ...formData, aboutFeature1Desc: e.target.value })}
+                        className="w-full px-3 py-1.5 rounded-lg border border-gray-300 text-xs"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="p-3.5 bg-white rounded-xl border border-gray-200 space-y-2">
+                    <span className="text-[10px] font-extrabold uppercase text-[#1D7946]">Destacado 2</span>
+                    <div>
+                      <label className="block text-[10px] font-bold text-gray-600 mb-0.5">Título</label>
+                      <input
+                        type="text"
+                        value={formData.aboutFeature2Title || ''}
+                        onChange={(e) => setFormData({ ...formData, aboutFeature2Title: e.target.value })}
+                        className="w-full px-3 py-1.5 rounded-lg border border-gray-300 text-xs font-bold"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-bold text-gray-600 mb-0.5">Descripción</label>
+                      <input
+                        type="text"
+                        value={formData.aboutFeature2Desc || ''}
+                        onChange={(e) => setFormData({ ...formData, aboutFeature2Desc: e.target.value })}
+                        className="w-full px-3 py-1.5 rounded-lg border border-gray-300 text-xs"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Lower Cards: Bienvenidos & Cotiza tu mudanza */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                  <div className="p-3.5 bg-white rounded-xl border border-gray-200 space-y-2">
+                    <span className="text-[10px] font-extrabold uppercase text-[#0E5197]">Caja "Bienvenidos"</span>
+                    <div>
+                      <label className="block text-[10px] font-bold text-gray-600 mb-0.5">Título de la caja</label>
+                      <input
+                        type="text"
+                        value={formData.aboutWelcomeTitle || ''}
+                        onChange={(e) => setFormData({ ...formData, aboutWelcomeTitle: e.target.value })}
+                        className="w-full px-3 py-1.5 rounded-lg border border-gray-300 text-xs font-bold"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-bold text-gray-600 mb-0.5">Texto de bienvenida</label>
+                      <textarea
+                        rows={2}
+                        value={formData.aboutWelcomeText || ''}
+                        onChange={(e) => setFormData({ ...formData, aboutWelcomeText: e.target.value })}
+                        className="w-full px-3 py-1.5 rounded-lg border border-gray-300 text-xs"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="p-3.5 bg-white rounded-xl border border-gray-200 space-y-2">
+                    <span className="text-[10px] font-extrabold uppercase text-[#1D7946]">Tarjeta de Cotización WhatsApp</span>
+                    <div>
+                      <label className="block text-[10px] font-bold text-gray-600 mb-0.5">Título</label>
+                      <input
+                        type="text"
+                        value={formData.aboutQuoteBoxTitle || ''}
+                        onChange={(e) => setFormData({ ...formData, aboutQuoteBoxTitle: e.target.value })}
+                        className="w-full px-3 py-1.5 rounded-lg border border-gray-300 text-xs font-bold"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-bold text-gray-600 mb-0.5">Subtítulo</label>
+                      <input
+                        type="text"
+                        value={formData.aboutQuoteBoxSubtitle || ''}
+                        onChange={(e) => setFormData({ ...formData, aboutQuoteBoxSubtitle: e.target.value })}
+                        className="w-full px-3 py-1.5 rounded-lg border border-gray-300 text-xs"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-bold text-gray-600 mb-0.5">Texto del Botón</label>
+                      <input
+                        type="text"
+                        value={formData.aboutQuoteBoxButtonText || ''}
+                        onChange={(e) => setFormData({ ...formData, aboutQuoteBoxButtonText: e.target.value })}
+                        className="w-full px-3 py-1.5 rounded-lg border border-gray-300 text-xs font-bold text-[#1D7946]"
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
 

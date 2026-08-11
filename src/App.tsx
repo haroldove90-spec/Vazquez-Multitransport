@@ -124,6 +124,20 @@ export default function App() {
           subtitle={config.aboutSubtitle}
           description={config.aboutDescription}
           values={config.aboutValues}
+          imageUrl={config.aboutImageUrl}
+          imageBadge={config.aboutImageBadge}
+          imageTitle={config.aboutImageTitle}
+          imageSubtitle={config.aboutImageSubtitle}
+          feature1Title={config.aboutFeature1Title}
+          feature1Desc={config.aboutFeature1Desc}
+          feature2Title={config.aboutFeature2Title}
+          feature2Desc={config.aboutFeature2Desc}
+          welcomeTitle={config.aboutWelcomeTitle}
+          welcomeText={config.aboutWelcomeText}
+          quoteBoxTitle={config.aboutQuoteBoxTitle}
+          quoteBoxSubtitle={config.aboutQuoteBoxSubtitle}
+          quoteBoxButtonText={config.aboutQuoteBoxButtonText}
+          whatsappNumber={config.whatsappNumber}
         />
 
         {/* 6. Services Section (#servicios) */}

@@ -7,6 +7,20 @@ interface AboutSectionProps {
   subtitle: string;
   description: string;
   values: ValueAddedItem[];
+  imageUrl?: string;
+  imageBadge?: string;
+  imageTitle?: string;
+  imageSubtitle?: string;
+  feature1Title?: string;
+  feature1Desc?: string;
+  feature2Title?: string;
+  feature2Desc?: string;
+  welcomeTitle?: string;
+  welcomeText?: string;
+  quoteBoxTitle?: string;
+  quoteBoxSubtitle?: string;
+  quoteBoxButtonText?: string;
+  whatsappNumber?: string;
 }
 
 export const AboutSection: React.FC<AboutSectionProps> = ({
@@ -14,6 +28,20 @@ export const AboutSection: React.FC<AboutSectionProps> = ({
   subtitle,
   description,
   values,
+  imageUrl = "https://images.unsplash.com/photo-1600518464441-9154a4dea21b?auto=format&fit=crop&w=800&q=80",
+  imageBadge = "Garantía de Satisfacción",
+  imageTitle = "Personal Altamente Capacitado",
+  imageSubtitle = "Protección, embalaje y manejo delicado de sus pertenencias.",
+  feature1Title = "Trailer Caja Seca 53 Pies",
+  feature1Desc = "Capacidad para grandes volúmenes y mudanzas completas.",
+  feature2Title = "Servicio los 365 Días",
+  feature2Desc = "Atención continua sin interrupción en todo el país.",
+  welcomeTitle = "Bienvenidos",
+  welcomeText = "En Vazquez Multitransport, entendemos que cada objeto tiene un valor especial. Ofrecemos soluciones integrales de logística y transporte local con los más altos estándares de cuidado.",
+  quoteBoxTitle = "Cotiza tu mudanza",
+  quoteBoxSubtitle = "Respondemos al instante vía WhatsApp para tu comodidad.",
+  quoteBoxButtonText = "CONTACTAR AHORA",
+  whatsappNumber = "525563477853",
 }) => {
   const renderIcon = (name: string) => {
     switch (name) {
@@ -26,6 +54,11 @@ export const AboutSection: React.FC<AboutSectionProps> = ({
       default:
         return <Award className="w-7 h-7 text-[#0E5197]" />;
     }
+  };
+
+  const getWaUrl = () => {
+    const text = "Hola, deseo solicitar una cotización con Vazquez Multitransport.";
+    return `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(text)}`;
   };
 
   return (
@@ -51,49 +84,55 @@ export const AboutSection: React.FC<AboutSectionProps> = ({
               Líderes en Logística, Fletes y Mudanzas Locales y Foráneas
             </h3>
 
-            <p className="text-gray-700 text-base leading-relaxed">
+            <p className="text-gray-700 text-base leading-relaxed whitespace-pre-line">
               {description}
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-              <div className="flex items-start gap-3 p-3 rounded-xl bg-gray-50 border border-gray-100">
+              <div className="flex items-start gap-3 p-3.5 rounded-xl bg-gray-50 border border-gray-200 shadow-2xs">
                 <CheckCircle2 className="w-5 h-5 text-[#1D7946] shrink-0 mt-0.5" />
                 <div>
-                  <h4 className="font-bold text-sm text-gray-900">Trailer Caja Seca 53 Pies</h4>
-                  <p className="text-xs text-gray-600">Capacidad para grandes volúmenes y mudanzas completas.</p>
+                  <h4 className="font-bold text-sm text-gray-900">{feature1Title}</h4>
+                  <p className="text-xs text-gray-600">{feature1Desc}</p>
                 </div>
               </div>
 
-              <div className="flex items-start gap-3 p-3 rounded-xl bg-gray-50 border border-gray-100">
+              <div className="flex items-start gap-3 p-3.5 rounded-xl bg-gray-50 border border-gray-200 shadow-2xs">
                 <CheckCircle2 className="w-5 h-5 text-[#1D7946] shrink-0 mt-0.5" />
                 <div>
-                  <h4 className="font-bold text-sm text-gray-900">Servicio los 365 Días</h4>
-                  <p className="text-xs text-gray-600">Atención continua sin interrupción en todo el país.</p>
+                  <h4 className="font-bold text-sm text-gray-900">{feature2Title}</h4>
+                  <p className="text-xs text-gray-600">{feature2Desc}</p>
                 </div>
               </div>
             </div>
           </div>
 
           <div className="lg:col-span-5 relative">
-            <div className="relative rounded-2xl overflow-hidden shadow-xl border border-gray-200">
+            <div className="relative rounded-2xl overflow-hidden shadow-xl border border-gray-200 group">
               <img
-                src="https://images.unsplash.com/photo-1600518464441-9154a4dea21b?auto=format&fit=crop&w=800&q=80"
-                alt="Personal de Mudanzas Vazquez"
-                className="w-full h-80 object-cover"
+                src={imageUrl}
+                alt={imageTitle || "Nuestra Empresa - Vazquez Multitransport"}
+                className="w-full h-80 sm:h-96 object-cover transition-transform duration-500 group-hover:scale-105"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-              <div className="absolute bottom-6 left-6 right-6 text-white space-y-1">
-                <span className="bg-[#1D7946] text-white font-extrabold text-xs uppercase px-2.5 py-1 rounded-md">
-                  Garantía de Satisfacción
-                </span>
-                <p className="font-extrabold text-lg pt-1">Personal Altamente Capacitado</p>
-                <p className="text-xs text-gray-200">Protección, embalaje y manejo delicado de sus pertenencias.</p>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent" />
+              <div className="absolute bottom-6 left-6 right-6 text-white space-y-1.5">
+                {imageBadge && (
+                  <span className="inline-block bg-[#1D7946] text-white font-extrabold text-xs uppercase px-3 py-1 rounded-md shadow-xs">
+                    {imageBadge}
+                  </span>
+                )}
+                {imageTitle && (
+                  <p className="font-extrabold text-xl pt-1 leading-snug">{imageTitle}</p>
+                )}
+                {imageSubtitle && (
+                  <p className="text-xs text-gray-200 font-medium leading-relaxed">{imageSubtitle}</p>
+                )}
               </div>
             </div>
           </div>
         </div>
 
-        {/* 3 Value Added Points (3 Valores Agregados Grid Matching Theme) */}
+        {/* 3 Value Added Points */}
         <div className="pt-8 border-t border-gray-100">
           <div className="text-center mb-10">
             <h3 className="text-2xl font-extrabold text-[#0E5197]">
@@ -104,11 +143,11 @@ export const AboutSection: React.FC<AboutSectionProps> = ({
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 bg-white">
             {/* Left Welcome Text */}
-            <div className="space-y-4 p-6 bg-gray-50/60 rounded-xl border border-gray-100 flex flex-col justify-between">
+            <div className="space-y-4 p-6 bg-gray-50/80 rounded-xl border border-gray-200 flex flex-col justify-between">
               <div>
-                <h3 className="text-xl font-bold text-[#0E5197] mb-2">Bienvenidos</h3>
-                <p className="text-xs text-gray-500 leading-relaxed">
-                  En Vazque Multitransport, entendemos que cada objeto tiene un valor especial. Ofrecemos soluciones integrales de logística y transporte local con los más altos estándares de cuidado.
+                <h3 className="text-xl font-bold text-[#0E5197] mb-2">{welcomeTitle}</h3>
+                <p className="text-xs text-gray-600 leading-relaxed font-normal">
+                  {welcomeText}
                 </p>
               </div>
               <a href="#contacto" className="pt-4 flex items-center gap-2 text-[#1D7946] text-[10px] font-bold uppercase tracking-wider hover:underline">
@@ -117,7 +156,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({
             </div>
 
             {/* Middle Values List */}
-            <div className="space-y-4 p-6 bg-white rounded-xl border border-gray-200">
+            <div className="space-y-4 p-6 bg-white rounded-xl border border-gray-200 shadow-2xs">
               <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest">Nuestros Valores</h3>
               <ul className="space-y-3.5">
                 {values && values.map((val, index) => (
@@ -129,7 +168,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({
                     </div>
                     <div>
                       <p className="text-[11px] font-bold text-gray-900">{val.title}</p>
-                      <p className="text-[10px] text-gray-400">{val.description}</p>
+                      <p className="text-[10px] text-gray-500 leading-tight">{val.description}</p>
                     </div>
                   </li>
                 ))}
@@ -141,13 +180,15 @@ export const AboutSection: React.FC<AboutSectionProps> = ({
               <div className="w-12 h-12 rounded-full bg-[#1D7946]/10 text-[#1D7946] flex items-center justify-center mb-3">
                 <ShieldCheck className="w-6 h-6 text-[#1D7946]" />
               </div>
-              <h4 className="text-sm font-bold text-gray-800 mb-1">Cotiza tu mudanza</h4>
-              <p className="text-[10px] text-gray-500 mb-4">Respondemos al instante vía WhatsApp para tu comodidad.</p>
+              <h4 className="text-sm font-bold text-gray-800 mb-1">{quoteBoxTitle}</h4>
+              <p className="text-[10px] text-gray-500 mb-4">{quoteBoxSubtitle}</p>
               <a
-                href="#contacto"
-                className="w-full py-2.5 bg-[#1D7946] hover:bg-emerald-700 text-white rounded text-xs font-bold text-center transition-colors shadow-xs"
+                href={getWaUrl()}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full py-2.5 bg-[#1D7946] hover:bg-emerald-700 text-white rounded-xl text-xs font-bold text-center transition-colors shadow-xs"
               >
-                CONTACTAR AHORA
+                {quoteBoxButtonText}
               </a>
             </div>
           </div>

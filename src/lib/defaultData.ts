@@ -49,6 +49,19 @@ export const DEFAULT_SITE_CONFIG: SiteConfig = {
   aboutTitle: "Sobre Nuestra Empresa",
   aboutSubtitle: "Compromiso, Puntualidad y Cuidado Profesional en Cada Traslado",
   aboutDescription: "En Transportes y Mudanzas Vazquez Multitransport entendemos el valor de sus pertenencias y equipo. Ofrecemos soluciones integrales de logística respaldadas por años de experiencia en el sector. Contamos con infraestructura completa que incluye desde fletes ligeros hasta tráileres con caja seca de 53 pies, brindando una atención personalizada adaptada a las necesidades específicas de cada cliente.",
+  aboutImageUrl: "https://images.unsplash.com/photo-1600518464441-9154a4dea21b?auto=format&fit=crop&w=800&q=80",
+  aboutImageBadge: "Garantía de Satisfacción",
+  aboutImageTitle: "Personal Altamente Capacitado",
+  aboutImageSubtitle: "Protección, embalaje y manejo delicado de sus pertenencias.",
+  aboutFeature1Title: "Trailer Caja Seca 53 Pies",
+  aboutFeature1Desc: "Capacidad para grandes volúmenes y mudanzas completas.",
+  aboutFeature2Title: "Servicio los 365 Días",
+  aboutFeature2Desc: "Atención continua sin interrupción en todo el país.",
+  aboutWelcomeTitle: "Bienvenidos",
+  aboutWelcomeText: "En Vazquez Multitransport, entendemos que cada objeto tiene un valor especial. Ofrecemos soluciones integrales de logística y transporte local con los más altos estándares de cuidado.",
+  aboutQuoteBoxTitle: "Cotiza tu mudanza",
+  aboutQuoteBoxSubtitle: "Respondemos al instante vía WhatsApp para tu comodidad.",
+  aboutQuoteBoxButtonText: "CONTACTAR AHORA",
 
   aboutValues: [
     {

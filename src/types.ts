@@ -53,6 +53,19 @@ export interface SiteConfig {
   aboutTitle: string;
   aboutSubtitle: string;
   aboutDescription: string;
+  aboutImageUrl: string;
+  aboutImageBadge: string;
+  aboutImageTitle: string;
+  aboutImageSubtitle: string;
+  aboutFeature1Title: string;
+  aboutFeature1Desc: string;
+  aboutFeature2Title: string;
+  aboutFeature2Desc: string;
+  aboutWelcomeTitle: string;
+  aboutWelcomeText: string;
+  aboutQuoteBoxTitle: string;
+  aboutQuoteBoxSubtitle: string;
+  aboutQuoteBoxButtonText: string;
   aboutValues: ValueAddedItem[];
 
   // Services
