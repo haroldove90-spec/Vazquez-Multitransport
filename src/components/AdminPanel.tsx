@@ -66,12 +66,9 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   const [copiedSql, setCopiedSql] = useState(false);
 
   const logoFileInputRef = useRef<HTMLInputElement>(null);
-  const sliderFileInputRefs = [
-    useRef<HTMLInputElement>(null),
-    useRef<HTMLInputElement>(null),
-    useRef<HTMLInputElement>(null)
-  ];
+  const sliderFileInputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const galleryFileInputRef = useRef<HTMLInputElement>(null);
+  const [uploadProgress, setUploadProgress] = useState<{ current: number; total: number } | null>(null);
 
   if (!isOpen) return null;
 
@@ -119,6 +116,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       console.error('Error subiendo logo:', err);
     } finally {
       setIsUploading(false);
+      if (e.target) e.target.value = '';
     }
   };
 
@@ -139,30 +137,74 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       console.error('Error subiendo imagen de slider:', err);
     } finally {
       setIsUploading(false);
+      if (e.target) e.target.value = '';
     }
   };
 
-  // Handle Gallery Image Upload
+  // Clear / Remove Slide Image
+  const handleClearSlideImage = (index: number) => {
+    setFormData(prev => {
+      const newSlides = [...prev.heroSlides];
+      newSlides[index] = { ...newSlides[index], imageUrl: '' };
+      return { ...prev, heroSlides: newSlides };
+    });
+  };
+
+  // Add new slide
+  const handleAddSlide = () => {
+    const newSlide = {
+      id: `slide-${Date.now()}`,
+      imageUrl: '',
+      title: 'Nuevo Servicio de Transporte',
+      subtitle: 'Descripción personalizada del servicio de logística y fletes.'
+    };
+    setFormData(prev => ({
+      ...prev,
+      heroSlides: [...prev.heroSlides, newSlide]
+    }));
+  };
+
+  // Delete slide
+  const handleDeleteSlide = (index: number) => {
+    if (formData.heroSlides.length <= 1) return;
+    setFormData(prev => ({
+      ...prev,
+      heroSlides: prev.heroSlides.filter((_, i) => i !== index)
+    }));
+  };
+
+  // Handle Fleet Gallery Batch Image Upload (Up to 20 photos at once)
   const handleGalleryImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const filesList = e.target.files;
+    if (!filesList) return;
+    const files: File[] = (Array.from(filesList) as File[]).slice(0, 20);
+    if (files.length === 0) return;
 
     setIsUploading(true);
+    setUploadProgress({ current: 0, total: files.length });
     try {
-      const url = await uploadImageFile(file, formData);
-      const newImg: GalleryImage = {
-        id: `gal-${Date.now()}`,
-        url: url,
-        title: `Unidad Vazquez Multitransport ${formData.galleryImages.length + 1}`
-      };
+      const newImages: GalleryImage[] = [];
+      for (let i = 0; i < files.length; i++) {
+        setUploadProgress({ current: i + 1, total: files.length });
+        const file = files[i];
+        const url = await uploadImageFile(file, formData);
+        const fileNameWithoutExt = file.name.replace(/\.[^/.]+$/, "").replace(/[-_]/g, " ");
+        newImages.push({
+          id: `gal-${Date.now()}-${i}-${Math.random().toString(36).substring(2, 6)}`,
+          url: url,
+          title: fileNameWithoutExt ? fileNameWithoutExt : `Unidad Vazquez ${formData.galleryImages.length + i + 1}`
+        });
+      }
       setFormData(prev => ({
         ...prev,
-        galleryImages: [...prev.galleryImages, newImg]
+        galleryImages: [...prev.galleryImages, ...newImages]
       }));
     } catch (err) {
-      console.error('Error subiendo imagen a galería:', err);
+      console.error('Error en subida masiva a galería:', err);
     } finally {
       setIsUploading(false);
+      setUploadProgress(null);
+      if (e.target) e.target.value = '';
     }
   };
 
@@ -293,92 +335,94 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
         )}
 
         <div className="bg-white rounded-xl shadow-lg border border-gray-200 flex-1 flex flex-col overflow-hidden">
-          {/* Tab Navigation */}
-          <div className="flex overflow-x-auto bg-gray-50 border-b border-gray-200 scrollbar-none px-4 pt-2">
-          <button
-            onClick={() => setActiveTab('general')}
-            className={`flex items-center gap-2 px-4 py-3 font-bold text-xs uppercase tracking-wider border-b-2 whitespace-nowrap transition-colors ${
-              activeTab === 'general'
-                ? 'border-[#0E5197] text-[#0E5197] bg-white rounded-t-lg'
-                : 'border-transparent text-gray-600 hover:text-gray-900'
-            }`}
-          >
-            <Palette className="w-4 h-4" />
-            <span>Identidad & Colores</span>
-          </button>
+          {/* Tab Navigation with responsive horizontal scrolling */}
+          <div className="w-full bg-slate-900 border-b border-slate-800 p-2 overflow-x-auto scrollbar-thin scrollbar-thumb-blue-600">
+            <div className="flex items-center min-w-max gap-2 px-1">
+              <button
+                onClick={() => setActiveTab('general')}
+                className={`flex items-center gap-2 px-3.5 py-2.5 rounded-lg font-bold text-xs uppercase tracking-wider whitespace-nowrap shrink-0 transition-all cursor-pointer ${
+                  activeTab === 'general'
+                    ? 'bg-blue-600 text-white shadow-sm'
+                    : 'text-slate-300 hover:text-white hover:bg-slate-800'
+                }`}
+              >
+                <Palette className="w-4 h-4 shrink-0" />
+                <span>Identidad & Colores</span>
+              </button>
 
-          <button
-            onClick={() => setActiveTab('contacts')}
-            className={`flex items-center gap-2 px-4 py-3 font-bold text-xs uppercase tracking-wider border-b-2 whitespace-nowrap transition-colors ${
-              activeTab === 'contacts'
-                ? 'border-[#0E5197] text-[#0E5197] bg-white rounded-t-lg'
-                : 'border-transparent text-gray-600 hover:text-gray-900'
-            }`}
-          >
-            <Phone className="w-4 h-4" />
-            <span>Teléfonos & WhatsApp</span>
-          </button>
+              <button
+                onClick={() => setActiveTab('contacts')}
+                className={`flex items-center gap-2 px-3.5 py-2.5 rounded-lg font-bold text-xs uppercase tracking-wider whitespace-nowrap shrink-0 transition-all cursor-pointer ${
+                  activeTab === 'contacts'
+                    ? 'bg-blue-600 text-white shadow-sm'
+                    : 'text-slate-300 hover:text-white hover:bg-slate-800'
+                }`}
+              >
+                <Phone className="w-4 h-4 shrink-0" />
+                <span>Teléfonos & WhatsApp</span>
+              </button>
 
-          <button
-            onClick={() => setActiveTab('slider')}
-            className={`flex items-center gap-2 px-4 py-3 font-bold text-xs uppercase tracking-wider border-b-2 whitespace-nowrap transition-colors ${
-              activeTab === 'slider'
-                ? 'border-[#0E5197] text-[#0E5197] bg-white rounded-t-lg'
-                : 'border-transparent text-gray-600 hover:text-gray-900'
-            }`}
-          >
-            <ImageIcon className="w-4 h-4" />
-            <span>Slider Principal (3)</span>
-          </button>
+              <button
+                onClick={() => setActiveTab('slider')}
+                className={`flex items-center gap-2 px-3.5 py-2.5 rounded-lg font-bold text-xs uppercase tracking-wider whitespace-nowrap shrink-0 transition-all cursor-pointer ${
+                  activeTab === 'slider'
+                    ? 'bg-blue-600 text-white shadow-sm'
+                    : 'text-slate-300 hover:text-white hover:bg-slate-800'
+                }`}
+              >
+                <ImageIcon className="w-4 h-4 shrink-0" />
+                <span>Slider Principal ({formData.heroSlides.length})</span>
+              </button>
 
-          <button
-            onClick={() => setActiveTab('content')}
-            className={`flex items-center gap-2 px-4 py-3 font-bold text-xs uppercase tracking-wider border-b-2 whitespace-nowrap transition-colors ${
-              activeTab === 'content'
-                ? 'border-[#0E5197] text-[#0E5197] bg-white rounded-t-lg'
-                : 'border-transparent text-gray-600 hover:text-gray-900'
-            }`}
-          >
-            <FileText className="w-4 h-4" />
-            <span>Bienvenida & Empresa</span>
-          </button>
+              <button
+                onClick={() => setActiveTab('content')}
+                className={`flex items-center gap-2 px-3.5 py-2.5 rounded-lg font-bold text-xs uppercase tracking-wider whitespace-nowrap shrink-0 transition-all cursor-pointer ${
+                  activeTab === 'content'
+                    ? 'bg-blue-600 text-white shadow-sm'
+                    : 'text-slate-300 hover:text-white hover:bg-slate-800'
+                }`}
+              >
+                <FileText className="w-4 h-4 shrink-0" />
+                <span>Bienvenida & Empresa</span>
+              </button>
 
-          <button
-            onClick={() => setActiveTab('services')}
-            className={`flex items-center gap-2 px-4 py-3 font-bold text-xs uppercase tracking-wider border-b-2 whitespace-nowrap transition-colors ${
-              activeTab === 'services'
-                ? 'border-[#0E5197] text-[#0E5197] bg-white rounded-t-lg'
-                : 'border-transparent text-gray-600 hover:text-gray-900'
-            }`}
-          >
-            <Sparkles className="w-4 h-4" />
-            <span>Servicios</span>
-          </button>
+              <button
+                onClick={() => setActiveTab('services')}
+                className={`flex items-center gap-2 px-3.5 py-2.5 rounded-lg font-bold text-xs uppercase tracking-wider whitespace-nowrap shrink-0 transition-all cursor-pointer ${
+                  activeTab === 'services'
+                    ? 'bg-blue-600 text-white shadow-sm'
+                    : 'text-slate-300 hover:text-white hover:bg-slate-800'
+                }`}
+              >
+                <Sparkles className="w-4 h-4 shrink-0" />
+                <span>Servicios</span>
+              </button>
 
-          <button
-            onClick={() => setActiveTab('gallery')}
-            className={`flex items-center gap-2 px-4 py-3 font-bold text-xs uppercase tracking-wider border-b-2 whitespace-nowrap transition-colors ${
-              activeTab === 'gallery'
-                ? 'border-[#0E5197] text-[#0E5197] bg-white rounded-t-lg'
-                : 'border-transparent text-gray-600 hover:text-gray-900'
-            }`}
-          >
-            <ImageIcon className="w-4 h-4" />
-            <span>Galería de Flota</span>
-          </button>
+              <button
+                onClick={() => setActiveTab('gallery')}
+                className={`flex items-center gap-2 px-3.5 py-2.5 rounded-lg font-bold text-xs uppercase tracking-wider whitespace-nowrap shrink-0 transition-all cursor-pointer ${
+                  activeTab === 'gallery'
+                    ? 'bg-blue-600 text-white shadow-sm'
+                    : 'text-slate-300 hover:text-white hover:bg-slate-800'
+                }`}
+              >
+                <ImageIcon className="w-4 h-4 shrink-0" />
+                <span>Galería de Flota ({formData.galleryImages.length})</span>
+              </button>
 
-          <button
-            onClick={() => setActiveTab('supabase')}
-            className={`flex items-center gap-2 px-4 py-3 font-bold text-xs uppercase tracking-wider border-b-2 whitespace-nowrap transition-colors ${
-              activeTab === 'supabase'
-                ? 'border-[#0E5197] text-[#0E5197] bg-white rounded-t-lg'
-                : 'border-transparent text-gray-600 hover:text-gray-900'
-            }`}
-          >
-            <Database className="w-4 h-4 text-emerald-600" />
-            <span>Base de Datos Supabase</span>
-          </button>
-        </div>
+              <button
+                onClick={() => setActiveTab('supabase')}
+                className={`flex items-center gap-2 px-3.5 py-2.5 rounded-lg font-bold text-xs uppercase tracking-wider whitespace-nowrap shrink-0 transition-all cursor-pointer ${
+                  activeTab === 'supabase'
+                    ? 'bg-emerald-600 text-white shadow-sm'
+                    : 'text-emerald-400 hover:text-white hover:bg-slate-800'
+                }`}
+              >
+                <Database className="w-4 h-4 shrink-0" />
+                <span className="font-extrabold text-white">Base de Datos Supabase</span>
+              </button>
+            </div>
+          </div>
 
         {/* Tab Content Body */}
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
@@ -613,10 +657,23 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
           {/* TAB 3: SLIDER PRINCIPAL */}
           {activeTab === 'slider' && (
             <div className="space-y-6">
-              <div className="bg-blue-50/50 p-4 rounded-xl border border-blue-100">
-                <p className="text-xs font-bold text-[#0E5197]">
-                  Configure las 3 imágenes y mensajes del slider principal de la página de inicio.
-                </p>
+              <div className="bg-blue-50/50 p-4 rounded-xl border border-blue-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <div>
+                  <p className="text-xs font-bold text-[#0E5197]">
+                    Configure las imágenes y mensajes del slider principal de la página de inicio.
+                  </p>
+                  <p className="text-[11px] text-gray-600 mt-0.5">
+                    Puede cambiar la imagen por una nueva, o presionar "Borrar Imagen" para limpiarla.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleAddSlide}
+                  className="inline-flex items-center gap-1.5 bg-[#0E5197] hover:bg-blue-900 text-white font-bold text-xs px-3.5 py-2 rounded-xl transition-colors shrink-0 cursor-pointer shadow-xs"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Agregar Nueva Diapositiva</span>
+                </button>
               </div>
 
               {formData.heroSlides.map((slide, idx) => (
@@ -625,6 +682,16 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                     <span className="font-extrabold text-sm text-[#0E5197] uppercase">
                       Diapositiva #{idx + 1}
                     </span>
+                    {formData.heroSlides.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteSlide(idx)}
+                        className="inline-flex items-center gap-1 text-xs text-red-600 hover:text-red-800 font-bold hover:underline cursor-pointer"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        <span>Eliminar Diapositiva</span>
+                      </button>
+                    )}
                   </div>
 
                   {/* Slide Image Upload */}
@@ -633,28 +700,52 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                       Imagen del Slider #{idx + 1}
                     </label>
                     <div className="flex flex-col sm:flex-row items-center gap-4">
-                      <img
-                        src={slide.imageUrl}
-                        alt={`Slide ${idx + 1}`}
-                        className="w-32 h-20 object-cover rounded-xl border border-gray-300 shadow-2xs"
-                      />
+                      {slide.imageUrl ? (
+                        <div className="relative group shrink-0">
+                          <img
+                            src={slide.imageUrl}
+                            alt={`Slide ${idx + 1}`}
+                            className="w-36 h-24 object-cover rounded-xl border border-gray-300 shadow-xs"
+                          />
+                        </div>
+                      ) : (
+                        <div className="w-36 h-24 rounded-xl border-2 border-dashed border-gray-300 bg-gray-100 flex flex-col items-center justify-center text-gray-400 shrink-0">
+                          <ImageIcon className="w-6 h-6 mb-1" />
+                          <span className="text-[10px] font-bold">Sin Imagen</span>
+                        </div>
+                      )}
+
                       <div className="space-y-2 flex-1 w-full">
                         <input
                           type="file"
-                          ref={sliderFileInputRefs[idx]}
+                          ref={(el) => { sliderFileInputRefs.current[idx] = el; }}
                           onChange={(e) => handleSlideImageUpload(idx, e)}
                           accept="image/*"
                           className="hidden"
                         />
-                        <button
-                          type="button"
-                          onClick={() => sliderFileInputRefs[idx].current?.click()}
-                          disabled={isUploading}
-                          className="inline-flex items-center gap-2 bg-[#0E5197] text-white font-bold text-xs px-3.5 py-2 rounded-xl hover:bg-blue-900 transition-colors"
-                        >
-                          <Upload className="w-3.5 h-3.5" />
-                          <span>Subir Imagen Directamente</span>
-                        </button>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => sliderFileInputRefs.current[idx]?.click()}
+                            disabled={isUploading}
+                            className="inline-flex items-center gap-2 bg-[#0E5197] text-white font-bold text-xs px-3.5 py-2 rounded-xl hover:bg-blue-900 transition-colors cursor-pointer shadow-xs"
+                          >
+                            <Upload className="w-3.5 h-3.5" />
+                            <span>{slide.imageUrl ? 'Reemplazar / Cambiar Imagen' : 'Subir Imagen Directamente'}</span>
+                          </button>
+
+                          {slide.imageUrl && (
+                            <button
+                              type="button"
+                              onClick={() => handleClearSlideImage(idx)}
+                              className="inline-flex items-center gap-1.5 bg-red-50 hover:bg-red-100 text-red-700 font-bold text-xs px-3 py-2 rounded-xl border border-red-200 transition-colors cursor-pointer"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                              <span>Borrar Imagen</span>
+                            </button>
+                          )}
+                        </div>
+
                         <input
                           type="text"
                           placeholder="O ingrese URL de imagen..."
@@ -664,7 +755,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                             newSlides[idx] = { ...newSlides[idx], imageUrl: e.target.value };
                             setFormData({ ...formData, heroSlides: newSlides });
                           }}
-                          className="w-full px-3 py-1.5 rounded-lg border border-gray-300 text-xs"
+                          className="w-full px-3 py-1.5 rounded-lg border border-gray-300 text-xs font-mono"
                         />
                       </div>
                     </div>
@@ -703,6 +794,17 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                   </div>
                 </div>
               ))}
+
+              <div className="pt-2 text-center">
+                <button
+                  type="button"
+                  onClick={handleAddSlide}
+                  className="inline-flex items-center gap-2 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold text-xs px-5 py-2.5 rounded-xl transition-colors cursor-pointer"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Agregar Otra Diapositiva al Slider</span>
+                </button>
+              </div>
             </div>
           )}
 
@@ -898,62 +1000,105 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
           {activeTab === 'gallery' && (
             <div className="space-y-6">
               <div className="bg-gray-50 p-5 rounded-2xl border border-gray-200 space-y-4">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                   <div>
-                    <h3 className="font-extrabold text-base text-gray-900">Imágenes del Negocio y Flota</h3>
-                    <p className="text-xs text-gray-600">Estas imágenes se muestran en el slider horizontal continuo.</p>
+                    <h3 className="font-extrabold text-base text-gray-900 flex items-center gap-2">
+                      <span>Imágenes del Negocio y Flota</span>
+                      <span className="text-xs bg-emerald-100 text-emerald-800 font-bold px-2.5 py-0.5 rounded-full">
+                        {formData.galleryImages.length} fotos
+                      </span>
+                    </h3>
+                    <p className="text-xs text-gray-600 mt-0.5">
+                      Sube fotos de tus camiones, plataformas y equipo. Se muestran en el carrusel continuo.
+                    </p>
                   </div>
 
-                  <div>
+                  <div className="flex flex-wrap items-center gap-2">
                     <input
                       type="file"
                       ref={galleryFileInputRef}
                       onChange={handleGalleryImageUpload}
                       accept="image/*"
+                      multiple
                       className="hidden"
                     />
                     <button
                       type="button"
                       onClick={() => galleryFileInputRef.current?.click()}
                       disabled={isUploading}
-                      className="inline-flex items-center gap-2 bg-[#1D7946] text-white text-xs font-bold px-4 py-2.5 rounded-xl hover:bg-emerald-700 transition-colors"
+                      className="inline-flex items-center gap-2 bg-[#1D7946] text-white text-xs font-bold px-4 py-2.5 rounded-xl hover:bg-emerald-700 transition-colors shadow-xs cursor-pointer"
                     >
                       <Upload className="w-4 h-4" />
-                      <span>Subir Nueva Imagen</span>
+                      <span>Subir Fotos (Masivo max 20)</span>
                     </button>
+
+                    {formData.galleryImages.length > 0 && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (window.confirm('¿Está seguro de vaciar toda la galería de fotos?')) {
+                            setFormData({ ...formData, galleryImages: [] });
+                          }
+                        }}
+                        className="inline-flex items-center gap-1.5 text-xs text-red-600 hover:text-red-800 hover:bg-red-50 font-bold px-3 py-2.5 rounded-xl border border-red-200 transition-colors cursor-pointer"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        <span>Vaciar Toda la Galería</span>
+                      </button>
+                    )}
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {formData.galleryImages.map((img, idx) => (
-                    <div key={img.id || idx} className="p-3 bg-white rounded-xl border border-gray-200 flex items-center gap-3">
-                      <img src={img.url} alt={img.title} className="w-20 h-16 object-cover rounded-lg shrink-0" />
-                      <div className="flex-1 space-y-1">
-                        <input
-                          type="text"
-                          value={img.title}
-                          onChange={(e) => {
-                            const newImgs = [...formData.galleryImages];
-                            newImgs[idx] = { ...newImgs[idx], title: e.target.value };
-                            setFormData({ ...formData, galleryImages: newImgs });
-                          }}
-                          className="w-full text-xs font-bold px-2 py-1 border border-gray-300 rounded"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const newImgs = formData.galleryImages.filter((_, i) => i !== idx);
-                            setFormData({ ...formData, galleryImages: newImgs });
-                          }}
-                          className="text-xs text-red-600 hover:underline flex items-center gap-1 font-semibold"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                          <span>Eliminar</span>
-                        </button>
+                {uploadProgress && (
+                  <div className="bg-emerald-50 border border-emerald-200 p-3 rounded-xl flex items-center gap-3 animate-pulse">
+                    <div className="w-4 h-4 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin"></div>
+                    <span className="text-xs font-bold text-emerald-800">
+                      Subiendo foto {uploadProgress.current} de {uploadProgress.total} a la galería...
+                    </span>
+                  </div>
+                )}
+
+                {formData.galleryImages.length === 0 ? (
+                  <div className="text-center py-12 bg-white rounded-xl border-2 border-dashed border-gray-200 text-gray-500 space-y-2">
+                    <ImageIcon className="w-10 h-10 mx-auto text-gray-300" />
+                    <p className="text-xs font-bold">No hay fotos en la galería de la flota.</p>
+                    <p className="text-[11px] text-gray-400">Haz clic en "Subir Fotos (Masivo max 20)" para añadir imágenes.</p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                    {formData.galleryImages.map((img, idx) => (
+                      <div key={img.id || idx} className="p-3 bg-white rounded-xl border border-gray-200 flex flex-col gap-2 shadow-2xs group hover:border-emerald-300 transition-colors">
+                        <div className="relative overflow-hidden rounded-lg bg-gray-100 aspect-4/3">
+                          <img src={img.url} alt={img.title} className="w-full h-full object-cover" />
+                        </div>
+                        <div className="space-y-1.5">
+                          <input
+                            type="text"
+                            value={img.title}
+                            onChange={(e) => {
+                              const newImgs = [...formData.galleryImages];
+                              newImgs[idx] = { ...newImgs[idx], title: e.target.value };
+                              setFormData({ ...formData, galleryImages: newImgs });
+                            }}
+                            placeholder="Título de la imagen..."
+                            className="w-full text-xs font-bold px-2 py-1 border border-gray-200 rounded-md focus:border-emerald-500 focus:outline-hidden"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const newImgs = formData.galleryImages.filter((_, i) => i !== idx);
+                              setFormData({ ...formData, galleryImages: newImgs });
+                            }}
+                            className="text-[11px] text-red-600 hover:text-red-800 hover:underline flex items-center gap-1 font-semibold cursor-pointer"
+                          >
+                            <Trash2 className="w-3 h-3" />
+                            <span>Eliminar Foto</span>
+                          </button>
+                        </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           )}

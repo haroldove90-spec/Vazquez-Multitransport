@@ -94,8 +94,8 @@ export const HeroSlider: React.FC<HeroSliderProps> = ({
       </AnimatePresence>
 
       {/* Content Overlay */}
-      <div className="relative z-10 max-w-7xl mx-auto h-full px-6 lg:px-8 flex flex-col justify-center">
-        <div className="max-w-2xl space-y-6">
+      <div className="relative z-10 max-w-7xl mx-auto h-full px-4 sm:px-6 lg:px-8 flex flex-col justify-center">
+        <div className="max-w-2xl space-y-4 sm:space-y-6">
           <motion.div
             key={`badge-${currentIndex}`}
             initial={{ opacity: 0, y: 15 }}
@@ -113,7 +113,7 @@ export const HeroSlider: React.FC<HeroSliderProps> = ({
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.5 }}
-            className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4 leading-tight drop-shadow-md"
+            className="text-2xl sm:text-4xl lg:text-5xl font-bold text-white mb-2 sm:mb-4 leading-tight drop-shadow-md"
           >
             {currentSlide.title}
           </motion.h1>
@@ -123,7 +123,7 @@ export const HeroSlider: React.FC<HeroSliderProps> = ({
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.5 }}
-            className="text-base sm:text-lg text-gray-200 font-normal leading-relaxed drop-shadow-xs max-w-xl"
+            className="text-sm sm:text-lg text-gray-200 font-normal leading-relaxed drop-shadow-xs max-w-xl"
           >
             {currentSlide.subtitle}
           </motion.p>
@@ -133,21 +133,21 @@ export const HeroSlider: React.FC<HeroSliderProps> = ({
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4, duration: 0.5 }}
-            className="pt-2 flex flex-wrap gap-4"
+            className="pt-2 flex flex-wrap gap-3 sm:gap-4"
           >
             <a
               href={waUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2.5 bg-[#1D7946] hover:bg-emerald-700 text-white font-bold text-sm px-6 py-3 rounded-md transition-all shadow-lg hover:shadow-emerald-900/40"
+              className="inline-flex items-center gap-2 sm:gap-2.5 bg-[#1D7946] hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm px-5 sm:px-6 py-2.5 sm:py-3 rounded-md transition-all shadow-lg hover:shadow-emerald-900/40"
             >
-              <MessageCircle className="w-5 h-5 fill-white text-[#1D7946]" />
+              <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5 fill-white text-[#1D7946]" />
               <span>{currentSlide.buttonText || "WhatsApp Directo"}</span>
             </a>
 
             <a
               href="#servicios"
-              className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white font-bold text-sm border border-white/30 px-6 py-3 rounded-md transition-all"
+              className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white font-bold text-xs sm:text-sm border border-white/30 px-5 sm:px-6 py-2.5 sm:py-3 rounded-md transition-all"
             >
               Ver Servicios
             </a>
@@ -155,25 +155,44 @@ export const HeroSlider: React.FC<HeroSliderProps> = ({
         </div>
       </div>
 
-      {/* Navigation Arrow Controls */}
+      {/* Desktop Navigation Arrow Controls */}
       <button
         onClick={handlePrev}
-        className="absolute left-4 top-1/2 -translate-y-1/2 z-20 p-2.5 rounded-md bg-black/40 hover:bg-[#0E5197] text-white backdrop-blur-xs transition-all focus:outline-hidden"
+        className="hidden md:flex absolute left-4 lg:left-8 top-1/2 -translate-y-1/2 z-20 p-3 rounded-full bg-black/40 hover:bg-[#0E5197] text-white backdrop-blur-md transition-all shadow-lg hover:scale-105 border border-white/10 cursor-pointer"
         aria-label="Anterior Slide"
       >
-        <ChevronLeft className="w-5 h-5" />
+        <ChevronLeft className="w-6 h-6" />
       </button>
 
       <button
         onClick={handleNext}
-        className="absolute right-4 top-1/2 -translate-y-1/2 z-20 p-2.5 rounded-md bg-black/40 hover:bg-[#0E5197] text-white backdrop-blur-xs transition-all focus:outline-hidden"
+        className="hidden md:flex absolute right-4 lg:right-8 top-1/2 -translate-y-1/2 z-20 p-3 rounded-full bg-black/40 hover:bg-[#0E5197] text-white backdrop-blur-md transition-all shadow-lg hover:scale-105 border border-white/10 cursor-pointer"
         aria-label="Siguiente Slide"
       >
-        <ChevronRight className="w-5 h-5" />
+        <ChevronRight className="w-6 h-6" />
       </button>
 
+      {/* Mobile Navigation Controls (Bottom Right Capsule) */}
+      <div className="md:hidden absolute bottom-5 right-4 z-20 flex items-center gap-2 bg-black/60 backdrop-blur-md p-1.5 rounded-full border border-white/20 shadow-lg">
+        <button
+          onClick={handlePrev}
+          className="p-1.5 rounded-full hover:bg-white/20 text-white transition-colors cursor-pointer"
+          aria-label="Anterior Slide"
+        >
+          <ChevronLeft className="w-4 h-4" />
+        </button>
+        <div className="w-[1px] h-3 bg-white/30" />
+        <button
+          onClick={handleNext}
+          className="p-1.5 rounded-full hover:bg-white/20 text-white transition-colors cursor-pointer"
+          aria-label="Siguiente Slide"
+        >
+          <ChevronRight className="w-4 h-4" />
+        </button>
+      </div>
+
       {/* Slide Indicators / Pill Dots */}
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2">
+      <div className="absolute bottom-5 sm:bottom-6 left-4 sm:left-1/2 sm:-translate-x-1/2 z-20 flex items-center gap-2">
         {slides.map((_, idx) => (
           <button
             key={idx}
