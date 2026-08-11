@@ -21,11 +21,13 @@ export default function App() {
     return sessionStorage.getItem('vazquez_admin_authenticated') === 'true';
   });
 
-  // Check URL hash for direct #admin access
+  // Check URL hash for direct #admin access (Home is always 'landing' website)
   useEffect(() => {
     const handleHashChange = () => {
       if (window.location.hash === '#admin' || window.location.pathname === '/admin') {
         setCurrentView('admin');
+      } else {
+        setCurrentView('landing');
       }
     };
     handleHashChange();
