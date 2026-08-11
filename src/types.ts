@@ -1,0 +1,78 @@
+export interface HeroSlide {
+  id: string;
+  imageUrl: string;
+  title: string;
+  subtitle: string;
+  buttonText: string;
+}
+
+export interface ValueAddedItem {
+  id: string;
+  iconName: string;
+  title: string;
+  description: string;
+}
+
+export interface ServiceItem {
+  id: string;
+  iconName: string;
+  title: string;
+  description: string;
+  badge?: string;
+}
+
+export interface GalleryImage {
+  id: string;
+  url: string;
+  title: string;
+}
+
+export interface SiteConfig {
+  pageTitle: string;
+  logoUrl: string;
+  logoSubtext: string;
+  primaryColor: string;
+  secondaryColor: string;
+  
+  // Contact & Top Bar
+  topPhones: string[];
+  whatsappNumber: string;
+  whatsappMessage: string;
+  facebookPage: string;
+  coverageAreas: string[];
+
+  // Hero Slider (3 slides)
+  heroSlides: HeroSlide[];
+
+  // Welcome section below slider
+  welcomeMessageTitle: string;
+  welcomeMessageSubtitle: string;
+  welcomeMessageBody: string;
+
+  // Nosotros / About Us
+  aboutTitle: string;
+  aboutSubtitle: string;
+  aboutDescription: string;
+  aboutValues: ValueAddedItem[];
+
+  // Services
+  servicesTitle: string;
+  servicesSubtitle: string;
+  servicesList: ServiceItem[];
+
+  // Gallery
+  galleryTitle: string;
+  gallerySubtitle: string;
+  galleryImages: GalleryImage[];
+
+  // Contact Section
+  contactTitle: string;
+  contactSubtitle: string;
+  contactMessage: string;
+  
+  // Supabase connection config
+  supabaseUrl: string;
+  supabaseAnonKey: string;
+  supabaseBucketName: string;
+  useSupabaseStorage: boolean;
+}

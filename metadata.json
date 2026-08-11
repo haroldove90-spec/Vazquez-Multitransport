@@ -1,0 +1,6 @@
+{
+  "name": "Vazquez Multitransport",
+  "description": "Sitio web oficial de Transportes y Mudanzas Vazquez Multitransport - Soluciones integrales de logística, mudanzas locales y foráneas los 365 días del año.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
