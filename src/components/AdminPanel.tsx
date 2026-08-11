@@ -17,7 +17,8 @@ import {
   AlertCircle,
   RefreshCw,
   Sparkles,
-  Lock
+  Lock,
+  Copy
 } from 'lucide-react';
 
 interface AdminPanelProps {
@@ -26,6 +27,31 @@ interface AdminPanelProps {
   config: SiteConfig;
   onUpdateConfig: (newConfig: SiteConfig) => void;
 }
+
+export const SUPABASE_SQL_SETUP = `-- 1. Crear tabla para guardar la configuración del sitio
+create table if not exists public.site_config (
+  id text primary key,
+  content jsonb not null,
+  updated_at timestamp with time zone default timezone('utc'::text, now())
+);
+
+-- 2. Habilitar permisos de lectura y actualización pública
+alter table public.site_config enable row level security;
+drop policy if exists "Acceso Publico site_config" on public.site_config;
+create policy "Acceso Publico site_config" on public.site_config for all using (true) with check (true);
+
+-- 3. Crear Bucket 'vazquez-media' para guardar imágenes
+insert into storage.buckets (id, name, public) values ('vazquez-media', 'vazquez-media', true) on conflict (id) do update set public = true;
+
+-- 4. Habilitar politicas de acceso publico para el bucket
+drop policy if exists "Permitir ver imagenes publicas" on storage.objects;
+create policy "Permitir ver imagenes publicas" on storage.objects for select using (bucket_id = 'vazquez-media');
+
+drop policy if exists "Permitir subir imagenes publicas" on storage.objects;
+create policy "Permitir subir imagenes publicas" on storage.objects for insert with check (bucket_id = 'vazquez-media');
+
+drop policy if exists "Permitir actualizar imagenes publicas" on storage.objects;
+create policy "Permitir actualizar imagenes publicas" on storage.objects for update using (bucket_id = 'vazquez-media');`;
 
 export const AdminPanel: React.FC<AdminPanelProps> = ({
   isOpen,
@@ -37,6 +63,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   const [activeTab, setActiveTab] = useState<'general' | 'contacts' | 'slider' | 'content' | 'services' | 'gallery' | 'supabase'>('general');
   const [isUploading, setIsUploading] = useState(false);
   const [saveStatus, setSaveStatus] = useState<{ type: 'success' | 'error' | null; message: string }>({ type: null, message: '' });
+  const [copiedSql, setCopiedSql] = useState(false);
 
   const logoFileInputRef = useRef<HTMLInputElement>(null);
   const sliderFileInputRefs = [
@@ -47,6 +74,12 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   const galleryFileInputRef = useRef<HTMLInputElement>(null);
 
   if (!isOpen) return null;
+
+  const handleCopySql = () => {
+    navigator.clipboard.writeText(SUPABASE_SQL_SETUP);
+    setCopiedSql(true);
+    setTimeout(() => setCopiedSql(false), 3000);
+  };
 
   const handleSave = async () => {
     // Save to LocalStorage and update global state
@@ -59,16 +92,18 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       const res = await syncToSupabase(formData);
       if (res.success) {
         setSaveStatus({ type: 'success', message: '¡Guardado localmente y en Supabase exitosamente!' });
+        setTimeout(() => {
+          setSaveStatus({ type: null, message: '' });
+        }, 4000);
       } else {
         setSaveStatus({ type: 'error', message: res.message });
       }
     } else {
       setSaveStatus({ type: 'success', message: '¡Cambios guardados correctamente en la aplicación!' });
+      setTimeout(() => {
+        setSaveStatus({ type: null, message: '' });
+      }, 4000);
     }
-
-    setTimeout(() => {
-      setSaveStatus({ type: null, message: '' });
-    }, 4000);
   };
 
   // Handle Logo File Upload
@@ -180,17 +215,80 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       <div className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 md:p-8 flex flex-col">
         {/* Status Toast Notification */}
         {saveStatus.message && (
-          <div className={`mb-4 p-4 rounded-xl border flex items-center justify-between gap-3 text-sm font-semibold shadow-sm ${
+          <div className={`mb-5 p-4 sm:p-5 rounded-xl border flex flex-col gap-3 shadow-md ${
             saveStatus.type === 'success'
               ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
               : saveStatus.type === 'error'
-              ? 'bg-red-50 text-red-800 border-red-200'
+              ? 'bg-red-50 text-red-950 border-red-200'
               : 'bg-blue-50 text-blue-800 border-blue-200'
           }`}>
-            <div className="flex items-center gap-2.5">
-              <RefreshCw className={`w-5 h-5 shrink-0 ${!saveStatus.type ? 'animate-spin text-blue-600' : 'text-emerald-600'}`} />
-              <span>{saveStatus.message}</span>
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2.5">
+                {saveStatus.type === 'error' ? (
+                  <AlertCircle className="w-5 h-5 shrink-0 text-red-600" />
+                ) : !saveStatus.type ? (
+                  <RefreshCw className="w-5 h-5 shrink-0 animate-spin text-blue-600" />
+                ) : (
+                  <CheckCircle className="w-5 h-5 shrink-0 text-emerald-600" />
+                )}
+                <span className="font-bold text-sm leading-snug">{saveStatus.message}</span>
+              </div>
+              {saveStatus.type === 'error' && (
+                <button
+                  type="button"
+                  onClick={() => setSaveStatus({ type: null, message: '' })}
+                  className="text-xs text-red-700 hover:text-red-900 font-bold underline shrink-0 cursor-pointer"
+                >
+                  Cerrar
+                </button>
+              )}
             </div>
+
+            {/* Quick Resolution Box for missing Supabase Table or Storage Bucket */}
+            {saveStatus.type === 'error' && (
+              <div className="pt-3 border-t border-red-200/80 text-xs text-red-900 space-y-3">
+                <p className="font-medium leading-relaxed">
+                  ⚠️ <strong>Causa del Error:</strong> Tu proyecto en Supabase (<code>snjcjrjyoouzhixymbnq</code>) está recién creado y aún no tiene la tabla <code>site_config</code> ni el bucket <code>vazquez-media</code>.
+                </p>
+                <div className="flex flex-wrap items-center gap-2.5 pt-1">
+                  <button
+                    type="button"
+                    onClick={handleCopySql}
+                    className="inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white font-bold px-4 py-2 rounded-lg text-xs transition-all shadow-xs cursor-pointer"
+                  >
+                    {copiedSql ? (
+                      <>
+                        <CheckCircle className="w-4 h-4 text-emerald-400" />
+                        <span>¡Código SQL Copiado!</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-4 h-4 text-blue-400" />
+                        <span>1. Copiar Script SQL</span>
+                      </>
+                    )}
+                  </button>
+
+                  <a
+                    href="https://supabase.com/dashboard/project/snjcjrjyoouzhixymbnq/sql/new"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 py-2 rounded-lg text-xs transition-all shadow-xs"
+                  >
+                    <span>2. Abrir SQL Editor en Supabase ↗</span>
+                  </a>
+
+                  <button
+                    type="button"
+                    onClick={handleSave}
+                    className="inline-flex items-center gap-1.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold px-4 py-2 rounded-lg text-xs transition-all shadow-xs cursor-pointer"
+                  >
+                    <RefreshCw className="w-3.5 h-3.5" />
+                    <span>3. Volver a Probar Guardar</span>
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         )}
 

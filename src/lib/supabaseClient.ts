@@ -93,13 +93,18 @@ export async function syncToSupabase(config: SiteConfig): Promise<{ success: boo
       .upsert({ id: 'main_config', content: config, updated_at: new Date().toISOString() });
 
     if (error) {
-      // If table doesn't exist yet, return friendly message
-      return { success: false, message: `Error en Supabase: ${error.message}. Si la tabla 'site_config' no existe aún, créala en el Editor SQL de Supabase.` };
+      if (error.message.includes('site_config') || error.code === 'PGRST301' || error.message.includes('cache')) {
+        return {
+          success: false,
+          message: `No se encontró la tabla 'public.site_config' en Supabase. Debes ejecutar el script SQL de creación en Supabase SQL Editor.`
+        };
+      }
+      return { success: false, message: `Error en Supabase: ${error.message}` };
     }
 
-    return { success: true, message: '¡Configuración guardada correctamente en Supabase!' };
+    return { success: true, message: '¡Configuración e imágenes guardadas correctamente en Supabase!' };
   } catch (err: any) {
-    return { success: false, message: `Error de conexión con Supabase: ${err.message}` };
+    return { success: false, message: `Error de conexión con Supabase: ${err?.message || err}` };
   }
 }
 
@@ -113,22 +118,28 @@ export async function uploadImageFile(
   if (config.useSupabaseStorage && sanitizedUrl && config.supabaseAnonKey) {
     try {
       const client = createClient(sanitizedUrl, config.supabaseAnonKey);
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 8)}.${fileExt}`;
+      const fileExt = file.name.split('.').pop() || 'png';
+      const fileName = `img_${Date.now()}_${Math.random().toString(36).substring(2, 7)}.${fileExt}`;
       const filePath = `uploads/${fileName}`;
+      const bucketName = config.supabaseBucketName || 'vazquez-media';
 
       const { error: uploadError } = await client.storage
-        .from(config.supabaseBucketName || 'vazquez-media')
-        .upload(filePath, file);
+        .from(bucketName)
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: true
+        });
 
       if (!uploadError) {
         const { data } = client.storage
-          .from(config.supabaseBucketName || 'vazquez-media')
+          .from(bucketName)
           .getPublicUrl(filePath);
 
         if (data?.publicUrl) {
           return data.publicUrl;
         }
+      } else {
+        console.warn('Supabase Storage error:', uploadError.message);
       }
     } catch (e) {
       console.warn('Supabase upload failed, falling back to base64 DataURL', e);
