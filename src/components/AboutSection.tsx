@@ -1,6 +1,7 @@
 import React from 'react';
 import { ValueAddedItem } from '../types';
 import { ShieldCheck, Truck, Clock, CheckCircle2, Award } from 'lucide-react';
+import { WhatsAppIcon } from './WhatsAppIcon';
 
 interface AboutSectionProps {
   title: string;
@@ -177,8 +178,8 @@ export const AboutSection: React.FC<AboutSectionProps> = ({
 
             {/* Right Quick WhatsApp Quote Card */}
             <div className="bg-gray-50 rounded-xl p-6 flex flex-col justify-center items-center text-center border border-gray-200 shadow-xs">
-              <div className="w-12 h-12 rounded-full bg-[#1D7946]/10 text-[#1D7946] flex items-center justify-center mb-3">
-                <ShieldCheck className="w-6 h-6 text-[#1D7946]" />
+              <div className="w-12 h-12 rounded-full bg-[#1D7946] text-white flex items-center justify-center mb-3 shadow-sm">
+                <WhatsAppIcon className="w-6 h-6 text-white shrink-0" />
               </div>
               <h4 className="text-sm font-bold text-gray-800 mb-1">{quoteBoxTitle}</h4>
               <p className="text-[10px] text-gray-500 mb-4">{quoteBoxSubtitle}</p>
@@ -186,9 +187,10 @@ export const AboutSection: React.FC<AboutSectionProps> = ({
                 href={getWaUrl()}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full py-2.5 bg-[#1D7946] hover:bg-emerald-700 text-white rounded-xl text-xs font-bold text-center transition-colors shadow-xs"
+                className="w-full py-3 bg-[#1D7946] hover:bg-emerald-700 text-white rounded-xl text-xs font-bold text-center transition-all shadow-md flex items-center justify-center gap-2"
               >
-                {quoteBoxButtonText}
+                <WhatsAppIcon className="w-4 h-4 text-white shrink-0" />
+                <span>{quoteBoxButtonText}</span>
               </a>
             </div>
           </div>

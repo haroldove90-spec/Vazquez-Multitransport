@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Logo } from './Logo';
 import { Menu, X, MessageCircle, Settings } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { WhatsAppIcon } from './WhatsAppIcon';
 
 interface HeaderProps {
   logoUrl?: string;
@@ -118,12 +119,12 @@ export const Header: React.FC<HeaderProps> = ({
         {/* Right Action Buttons */}
         <div className="hidden lg:flex items-center gap-3">
           <a
-            href={`https://wa.me/${whatsappNumber}`}
+            href={`https://wa.me/${whatsappNumber.replace(/\D/g, '') || '5523068535'}`}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 bg-[#1D7946] hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2.5 rounded-md transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
           >
-            <MessageCircle className="w-4 h-4" />
+            <WhatsAppIcon className="w-4 h-4 text-white shrink-0" />
             <span>Cotizar WhatsApp</span>
           </a>
 
@@ -187,12 +188,12 @@ export const Header: React.FC<HeaderProps> = ({
 
               <div className="pt-2">
                 <a
-                  href={`https://wa.me/${whatsappNumber}`}
+                  href={`https://wa.me/${whatsappNumber.replace(/\D/g, '') || '5523068535'}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-2 bg-[#1D7946] hover:bg-emerald-700 text-white font-bold px-4 py-3 rounded-xl w-full text-center shadow-xs"
+                  className="flex items-center justify-center gap-2.5 bg-[#1D7946] hover:bg-emerald-700 text-white font-bold px-4 py-3 rounded-xl w-full text-center shadow-xs"
                 >
-                  <MessageCircle className="w-5 h-5" />
+                  <WhatsAppIcon className="w-5 h-5 text-white shrink-0" />
                   <span>Cotizar por WhatsApp Directo</span>
                 </a>
               </div>

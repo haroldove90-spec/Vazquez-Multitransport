@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { MessageCircle, Phone, MapPin, Facebook, Send, Clock, CheckCircle2 } from 'lucide-react';
+import { WhatsAppIcon } from './WhatsAppIcon';
 
 interface ContactSectionProps {
   title: string;
@@ -59,8 +60,8 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
             {/* Primary WhatsApp Card */}
             <div className="bg-emerald-50 border-2 border-[#1D7946] p-6 rounded-2xl shadow-md relative overflow-hidden">
               <div className="flex items-center gap-4 mb-4">
-                <div className="w-12 h-12 rounded-full bg-[#1D7946] text-white flex items-center justify-center shrink-0">
-                  <MessageCircle className="w-6 h-6" />
+                <div className="w-12 h-12 rounded-full bg-[#1D7946] text-white flex items-center justify-center shrink-0 shadow-md">
+                  <WhatsAppIcon className="w-7 h-7 text-white shrink-0" />
                 </div>
                 <div>
                   <h3 className="font-extrabold text-xl text-gray-900">WhatsApp Directo</h3>
@@ -69,12 +70,12 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
               </div>
 
               <a
-                href={`https://wa.me/${whatsappNumber}?text=${encodeURIComponent('Hola, deseo solicitar una cotización con Vazquez Multitransport.')}`}
+                href={`https://wa.me/${whatsappNumber.replace(/\D/g, '') || '5523068535'}?text=${encodeURIComponent('Hola, deseo solicitar una cotización con Vazquez Multitransport.')}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2 bg-[#1D7946] hover:bg-emerald-700 text-white font-extrabold px-6 py-3.5 rounded-xl w-full text-center transition-all shadow-md transform hover:-translate-y-0.5"
+                className="flex items-center justify-center gap-2.5 bg-[#1D7946] hover:bg-emerald-700 text-white font-extrabold px-6 py-3.5 rounded-xl w-full text-center transition-all shadow-md transform hover:-translate-y-0.5"
               >
-                <MessageCircle className="w-5 h-5 fill-white text-[#1D7946]" />
+                <WhatsAppIcon className="w-5 h-5 text-white shrink-0" />
                 <span>Enviar WhatsApp: {whatsappNumber}</span>
               </a>
             </div>
@@ -212,9 +213,9 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
 
               <button
                 type="submit"
-                className="w-full flex items-center justify-center gap-2 bg-[#1D7946] hover:bg-emerald-700 text-white font-extrabold text-base px-6 py-4 rounded-xl transition-all shadow-lg hover:shadow-emerald-900/30 transform hover:-translate-y-0.5 cursor-pointer"
+                className="w-full flex items-center justify-center gap-2.5 bg-[#1D7946] hover:bg-emerald-700 text-white font-extrabold text-base px-6 py-4 rounded-xl transition-all shadow-lg hover:shadow-emerald-900/30 transform hover:-translate-y-0.5 cursor-pointer"
               >
-                <Send className="w-5 h-5" />
+                <WhatsAppIcon className="w-5 h-5 text-white shrink-0" />
                 <span>Enviar Cotización por WhatsApp</span>
               </button>
             </form>

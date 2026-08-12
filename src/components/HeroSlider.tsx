@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { HeroSlide } from '../types';
 import { ChevronLeft, ChevronRight, MessageCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { WhatsAppIcon } from './WhatsAppIcon';
 
 interface HeroSliderProps {
   slides: HeroSlide[];
@@ -141,7 +142,7 @@ export const HeroSlider: React.FC<HeroSliderProps> = ({
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 sm:gap-2.5 bg-[#1D7946] hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm px-5 sm:px-6 py-2.5 sm:py-3 rounded-md transition-all shadow-lg hover:shadow-emerald-900/40"
             >
-              <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5 fill-white text-[#1D7946]" />
+              <WhatsAppIcon className="w-4 h-4 sm:w-5 sm:h-5 text-white shrink-0" />
               <span>{currentSlide.buttonText || "WhatsApp Directo"}</span>
             </a>
 

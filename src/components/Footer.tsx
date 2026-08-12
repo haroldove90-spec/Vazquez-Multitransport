@@ -1,6 +1,7 @@
 import React from 'react';
 import { Logo } from './Logo';
 import { Phone, MessageCircle, MapPin, Settings } from 'lucide-react';
+import { WhatsAppIcon } from './WhatsAppIcon';
 
 interface FooterProps {
   logoUrl?: string;
@@ -112,12 +113,12 @@ export const Footer: React.FC<FooterProps> = ({
                 </a>
               ))}
               <a
-                href={`https://wa.me/${whatsappNumber}`}
+                href={`https://wa.me/${whatsappNumber.replace(/\D/g, '') || '5523068535'}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 bg-[#1D7946] hover:bg-emerald-700 text-white font-bold text-xs px-3.5 py-2 rounded-lg transition-all mt-2"
               >
-                <MessageCircle className="w-4 h-4" />
+                <WhatsAppIcon className="w-4 h-4 text-white shrink-0" />
                 <span>WhatsApp: {whatsappNumber}</span>
               </a>
             </div>

@@ -12,6 +12,7 @@ import { ContactSection } from './components/ContactSection';
 import { Footer } from './components/Footer';
 import { AdminPanel } from './components/AdminPanel';
 import { AdminLogin } from './components/AdminLogin';
+import { WhatsAppIcon } from './components/WhatsAppIcon';
 import { MessageCircle } from 'lucide-react';
 
 export default function App() {
@@ -210,14 +211,14 @@ export default function App() {
       {/* Floating WhatsApp Action Button */}
       {config.whatsappNumber && (
         <a
-          href={`https://wa.me/${config.whatsappNumber}?text=${encodeURIComponent(config.whatsappMessage)}`}
+          href={`https://wa.me/${config.whatsappNumber.replace(/\D/g, '') || '5523068535'}?text=${encodeURIComponent(config.whatsappMessage || 'Hola, quisiera cotizar un flete/mudanza con Vazquez Multitransport.')}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="fixed bottom-6 right-6 z-40 bg-[#1D7946] hover:bg-emerald-700 text-white p-4 rounded-full shadow-2xl transition-all transform hover:scale-110 flex items-center justify-center border-2 border-white group"
+          className="fixed bottom-6 right-6 z-40 bg-[#1D7946] hover:bg-emerald-700 text-white p-3.5 sm:p-4 rounded-full shadow-2xl transition-all transform hover:scale-110 flex items-center justify-center border-2 border-white group"
           aria-label="Contactar por WhatsApp"
         >
-          <MessageCircle className="w-7 h-7 fill-white text-[#1D7946]" />
-          <span className="max-w-0 overflow-hidden whitespace-nowrap group-hover:max-w-xs transition-all duration-300 ease-in-out font-bold text-xs pl-0 group-hover:pl-2">
+          <WhatsAppIcon className="w-7 h-7 text-white shrink-0" />
+          <span className="max-w-0 overflow-hidden whitespace-nowrap group-hover:max-w-xs transition-all duration-300 ease-in-out font-bold text-xs pl-0 group-hover:pl-2.5">
             Cotizar por WhatsApp
           </span>
         </a>
